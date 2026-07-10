@@ -1,5 +1,5 @@
 class USER {
-  String _id = "";
+  final String id;
   final String name;
   final String email;
   final String photoUrl;
@@ -16,10 +16,8 @@ class USER {
     required this.oAuthProvider,
     required this.photoUrl,
     required this.year,
-    required id,
-  }) {
-    _id = id;
-  }
+    required this.id,
+  }) {}
 
   factory USER.fromJson(Map<String, Object?> json) {
     return USER(
@@ -30,7 +28,7 @@ class USER {
       oAuthProvider: json['oAuthProvider'] as String,
       photoUrl: json['photoUrl'] as String,
       year: json['year'] as int,
-      id: json['_id'] as String,
+      id: json['id'] as String,
     );
   }
 }
