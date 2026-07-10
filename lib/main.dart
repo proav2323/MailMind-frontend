@@ -1,3 +1,4 @@
+import 'package:MailMind/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:MailMind/pages/home.dart';
@@ -24,7 +25,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       title: 'MailMind',
-      theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
+      theme: ThemeMode.system == ThemeMode.dark
+          ? AppTheme.darkTheme
+          : AppTheme.lightTheme,
       routerConfig: _router,
     );
   }

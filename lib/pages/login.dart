@@ -13,7 +13,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: "MailMind"),
-      body: Text("Login"),
+      body: ElevatedButton(onPressed: () => {}, child: Text("login")),
     );
   }
 }
