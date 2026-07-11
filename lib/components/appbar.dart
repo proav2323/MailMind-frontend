@@ -17,9 +17,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 4,
       leading: IconButton(
         onPressed: () => {},
-        icon: route == "/"
-            ? ImageIcon(AssetImage('assets/MailMind-logo.png'), size: 100)
-            : Icon(Icons.arrow_back),
+        icon: ImageIcon(AssetImage('assets/MailMind-logo.png'), size: 100),
       ),
       actions: actions,
     );

@@ -1,3 +1,4 @@
+import 'package:MailMind/services/api.dart';
 import 'package:MailMind/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,7 +6,8 @@ import 'package:MailMind/pages/home.dart';
 import 'package:go_router/go_router.dart';
 import 'package:MailMind/pages/login.dart';
 
-void main() {
+void main() async {
+  await initApi();
   runApp(ProviderScope(child: MyApp()));
 }
 
@@ -25,9 +27,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       title: 'MailMind',
-      theme: ThemeMode.system == ThemeMode.dark
-          ? AppTheme.darkTheme
-          : AppTheme.lightTheme,
+      themeMode: ThemeMode.system,
+      darkTheme: AppTheme.darkTheme,
+      theme: AppTheme.lightTheme,
       routerConfig: _router,
     );
   }
