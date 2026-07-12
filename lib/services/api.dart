@@ -33,7 +33,6 @@ Future<Response> login(
   String photoUrl,
   String oAuthProvider,
 ) async {
-  log(name + email + photoUrl + oAuthProvider);
   _dio.options.headers['Content-Type'] = 'application/json';
   final res = await _dio.post(
     '/auth/login',

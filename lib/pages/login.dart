@@ -4,7 +4,6 @@ import 'package:MailMind/services/auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_sign_in_web/web_only.dart';
 import 'package:MailMind/services/api.dart';
 
 class LoginPage extends StatefulWidget {
