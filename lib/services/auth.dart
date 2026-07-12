@@ -55,9 +55,9 @@ Future<void> loginWithGoogle() async {
   );
 
   var res = await login(
-    user.displayName != null ? user.displayName! : "",
+    user.displayName != null ? user.displayName! : "no name",
     user.email,
-    user.photoUrl != null ? user.photoUrl! : "",
+    user.photoUrl != null ? user.photoUrl! : "no photo",
     "google",
   );
 

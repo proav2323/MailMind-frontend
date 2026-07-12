@@ -7,8 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:MailMind/pages/login.dart';
 
 void main() async {
-  await initApi();
   runApp(ProviderScope(child: MyApp()));
+  await initApi();
 }
 
 // GoRouter configuration

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
@@ -9,7 +11,7 @@ late PersistCookieJar _cookieJar;
 final BACKEND_URL = 'https://mailmind-backend.vercel.app';
 
 Future<void> initApi() async {
-  _dio = Dio();
+  _dio = Dio(BaseOptions(baseUrl: BACKEND_URL));
 
   // 1. Get a safe directory on the device to save cookie files
   final directory = await getApplicationDocumentsDirectory();
@@ -31,13 +33,15 @@ Future<Response> login(
   String photoUrl,
   String oAuthProvider,
 ) async {
+  log(name + email + photoUrl + oAuthProvider);
+  _dio.options.headers['Content-Type'] = 'application/json';
   final res = await _dio.post(
-    BACKEND_URL + '/auth/login',
+    '/auth/login',
     data: {
-      name: name,
-      email: email,
-      photoUrl: photoUrl,
-      oAuthProvider: oAuthProvider,
+      "name": name,
+      "email": email,
+      "photoUrl": photoUrl,
+      "oAuthProvider": oAuthProvider,
     },
   );
 
@@ -45,7 +49,7 @@ Future<Response> login(
 }
 
 Future<USER> getUserProfile() async {
-  final response = await _dio.get(BACKEND_URL + '/auth/');
+  final response = await _dio.get('/auth');
   return USER.fromJson(response.data!);
 }
 
