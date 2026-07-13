@@ -7,14 +7,12 @@ class USER {
   final String name;
   final String email;
   final String photoUrl;
-  final String college;
-  final String branch;
-  final int year;
+  final String? college;
+  final String? branch;
+  final int? year;
   final String oAuthProvider;
   final DateTime created_at;
   final DateTime updated_at;
-  final List<EMAIL> Emails;
-  final List<NOTIFICATIONS> notifications;
 
   USER({
     required this.name,
@@ -27,24 +25,20 @@ class USER {
     required this.id,
     required this.updated_at,
     required this.created_at,
-    required this.Emails,
-    required this.notifications,
   }) {}
 
   factory USER.fromJson(Map<String, Object?> json) {
     return USER(
       name: json['name'] as String,
       email: json['email'] as String,
-      branch: json['branch'] as String,
-      college: json['college'] as String,
+      branch: json['branch'] as String?,
+      college: json['college'] as String?,
       oAuthProvider: json['oAuthProvider'] as String,
       photoUrl: json['photoUrl'] as String,
-      year: json['year'] as int,
+      year: json['year'] as int?,
       id: json['id'] as String,
-      updated_at: json['updated_at'] as DateTime,
-      created_at: json['created_at'] as DateTime,
-      Emails: json['emails'] as List<EMAIL>,
-      notifications: json['notifications'] as List<NOTIFICATIONS>,
+      updated_at: DateTime.parse(json['updated_at'] as String),
+      created_at: DateTime.parse(json['created_at'] as String),
     );
   }
 }

@@ -8,7 +8,8 @@ import 'package:MailMind/models/user.dart';
 
 late Dio _dio;
 late PersistCookieJar _cookieJar;
-final BACKEND_URL = 'https://mailmind-backend.vercel.app';
+// final BACKEND_URL = 'https://mailmind-backend.vercel.app';
+final BACKEND_URL = 'http://10.0.2.2:3000';
 
 Future<void> initApi() async {
   _dio = Dio(BaseOptions(baseUrl: BACKEND_URL));

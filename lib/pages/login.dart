@@ -17,12 +17,11 @@ class _LoginPageState extends State<LoginPage> {
   bool isLoading = false;
   void loginUser() {
     if (kIsWeb) {
-      login("hello", "hello", "hello", "hello");
     } else {
       setState(() {
         isLoading = true;
       });
-      loginWithGoogle()
+      loginWithGoogle(context)
           .onError((err, trace) {
             log(err.toString());
             ScaffoldMessenger.of(
@@ -34,10 +33,13 @@ class _LoginPageState extends State<LoginPage> {
               isLoading = false;
             });
           })
-          .catchError((err, trace) {})
-          .then((value) {
-            context.go('/');
-          });
+          .catchError((err, trace) {
+            log(err.toString());
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(err.toString())));
+          })
+          .then((value) {});
     }
   }
 

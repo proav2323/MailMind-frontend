@@ -31,6 +31,7 @@ class _MyHomePageState extends State<MyHomePage> {
             context.go("/login");
           },
           data: (value) {
+            log(value.toString());
             setState(() {
               widget.isLaoding = false;
               widget.user = value;
@@ -75,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
           body: widget.isLaoding == true
               ? Center(child: CircularProgressIndicator())
               : widget.user != null
-              ? Text("user")
+              ? Text(widget.user!.name)
               : Text("something went wrong"),
         );
       },
