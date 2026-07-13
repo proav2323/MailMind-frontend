@@ -9,11 +9,10 @@ import 'package:MailMind/pages/login.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
+  if (kReleaseMode == false) {
+    await dotenv.load(fileName: '.env');
+  }
   runApp(ProviderScope(child: MyApp()));
-  // if (kReleaseMode == false) {
-  //   await dotenv.load(fileName: '.env');
-  // }
-  await dotenv.load(fileName: '.env');
   await initApi();
 }
 

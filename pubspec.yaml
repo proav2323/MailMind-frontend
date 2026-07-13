@@ -86,7 +86,7 @@ flutter:
     - assets/
     - path: .env
       flavors:
-        - development
+        - dev
 
   # To add assets to your application, add an assets section, like this:
   # assets:
