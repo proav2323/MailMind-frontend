@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:MailMind/components/appbar.dart';
 import 'package:MailMind/services/auth.dart';
+import 'package:MailMind/services/config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:MailMind/models/user.dart';
@@ -18,6 +19,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   void init() {
+    log(CONFIGAPIKEYS.GOOGLE_SECRET);
     final container = ProviderContainer();
     container.listen(
       userProvider,

@@ -10,19 +10,15 @@ import 'package:google_sign_in_all_platforms/google_sign_in_all_platforms.dart';
 import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
 import 'package:googleapis/people/v1.dart';
 import 'package:googleapis/gmail/v1.dart';
+import 'package:MailMind/services/config.dart';
 
 // final GoogleSignIn googleSignIn = GoogleSignIn.instance;
 final googleSignIn = GoogleSignIn(
   // See 'How to Get Google OAuth Credentials' section below
   params: GoogleSignInParams(
-    clientId: kReleaseMode
-        ? String.fromEnvironment("GOOGLE_CLIENT_ID")
-        : dotenv.get("GOOGLE_CLIENT_ID"),
-    clientSecret: kReleaseMode
-        ? String.fromEnvironment('GOOGLE_SECRET')
-        : dotenv.get(
-            'GOOGLE_SECRET',
-          ), // Don't worry - not truly a secret! See 'Client Secret Requirements'
+    clientId: CONFIGAPIKEYS.GOOGLE_CLINET_ID,
+    clientSecret: CONFIGAPIKEYS
+        .GOOGLE_SECRET, // Don't worry - not truly a secret! See 'Client Secret Requirements'
     scopes: scopes,
   ),
 );

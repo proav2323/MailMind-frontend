@@ -84,9 +84,6 @@ flutter:
   uses-material-design: true
   assets:
     - assets/
-    - path: .env
-      flavors:
-        - staging
 
   # To add assets to your application, add an assets section, like this:
   # assets:
