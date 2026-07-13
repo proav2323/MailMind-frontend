@@ -22,7 +22,6 @@ final userProvider = FutureProvider<USER?>((ref) async {
 }, retry: (retryCount, error) {});
 
 Future<USER> auth(bool firstTime, String? token) async {
-  // clearAllCookies();
   if (firstTime == false) {
     await setCustomCookie(Uri.parse(BACKEND_URL + "/auth/"), token!, "token");
   }
@@ -67,17 +66,7 @@ Future<void> loginWithGoogle(BuildContext context) async {
     user.photoUrl != null ? user.photoUrl! : "no photo",
     "google",
   );
-
-  List<Cookie> cookies = await getCookies(res.realUri);
-  int index = 0;
-  for (int i = 0; i < cookies.length; i++) {
-    if (cookies[i].name == "token") {
-      index = i;
-      return;
-    }
-  }
   String token = res.data;
-  String cookieToken = cookies[index].value;
 
   USER finalUser = await auth(false, token);
   userProvider.overrideWithValue(AsyncValue.data(finalUser));

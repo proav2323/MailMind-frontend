@@ -13,6 +13,8 @@ class USER {
   final String oAuthProvider;
   final DateTime created_at;
   final DateTime updated_at;
+  List<EMAIL> emails = [];
+  List<NOTIFICATIONS> notifications = [];
 
   USER({
     required this.name,
@@ -25,7 +27,17 @@ class USER {
     required this.id,
     required this.updated_at,
     required this.created_at,
-  }) {}
+    required List<dynamic> emails,
+    required List<dynamic> notifications,
+  }) {
+    emails.forEach((email) {
+      this.emails.add(EMAIL.fromJson(email));
+    });
+
+    notifications.forEach((email) {
+      this.notifications.add(NOTIFICATIONS.fromJson(email));
+    });
+  }
 
   factory USER.fromJson(Map<String, Object?> json) {
     return USER(
@@ -39,6 +51,8 @@ class USER {
       id: json['id'] as String,
       updated_at: DateTime.parse(json['updated_at'] as String),
       created_at: DateTime.parse(json['created_at'] as String),
+      emails: json['emails'] as List<dynamic>,
+      notifications: json['notifications'] as List<dynamic>,
     );
   }
 }

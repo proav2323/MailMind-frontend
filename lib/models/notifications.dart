@@ -26,7 +26,7 @@ class NOTIFICATIONS {
       isSent: json['isSent'] as bool,
       title: json['title'] as String,
       body: json['body'] as String,
-      scheduledTime: json['scheduledTime'] as DateTime,
+      scheduledTime: DateTime.parse(json['scheduledTime'].toString()),
       User: json['User'] as USER,
     );
   }
