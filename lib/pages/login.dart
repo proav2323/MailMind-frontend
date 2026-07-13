@@ -48,13 +48,6 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       isLoading = false;
     });
-
-    googleSignIn.authenticationEvents.listen(
-      (data) {},
-      onError: (err) {},
-      onDone: () {},
-    );
-
     super.initState();
   }
 
@@ -89,32 +82,36 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(height: 20),
               SizedBox(
                 width: screenWidth * 0.95,
-                child: ElevatedButton(
-                  onPressed: () => loginUser(),
-                  style: ButtonStyle(
-                    padding: WidgetStatePropertyAll(
-                      EdgeInsets.symmetric(horizontal: 0, vertical: 16),
-                    ),
-                  ),
-                  child: isLoading
-                      ? Center(child: CircularProgressIndicator())
-                      : Center(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: Image(
-                                  image: AssetImage('assets/google-logo.png'),
-                                ),
-                              ),
-                              SizedBox(height: 0, width: 15),
-                              Text("Sign in With google"),
-                            ],
+                child: kIsWeb
+                    ? googleSignIn.signInButton()
+                    : ElevatedButton(
+                        onPressed: () => loginUser(),
+                        style: ButtonStyle(
+                          padding: WidgetStatePropertyAll(
+                            EdgeInsets.symmetric(horizontal: 0, vertical: 16),
                           ),
                         ),
-                ),
+                        child: isLoading
+                            ? Center(child: CircularProgressIndicator())
+                            : Center(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: Image(
+                                        image: AssetImage(
+                                          'assets/google-logo.png',
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 0, width: 15),
+                                    Text("Sign in With google"),
+                                  ],
+                                ),
+                              ),
+                      ),
               ),
             ],
           ),

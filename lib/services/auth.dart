@@ -1,20 +1,40 @@
+import 'dart:developer';
 import 'package:MailMind/models/user.dart';
 import 'package:MailMind/services/api.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'dart:io';
-import 'dart:developer';
+import 'package:google_sign_in_all_platforms/google_sign_in_all_platforms.dart';
+import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
+import 'package:googleapis/people/v1.dart';
+import 'package:googleapis/gmail/v1.dart';
 
-final GoogleSignIn googleSignIn = GoogleSignIn.instance;
+// final GoogleSignIn googleSignIn = GoogleSignIn.instance;
+final googleSignIn = GoogleSignIn(
+  // See 'How to Get Google OAuth Credentials' section below
+  params: GoogleSignInParams(
+    clientId: dotenv.get("GOOGLE_CLIENT_ID"),
+    clientSecret: dotenv.get(
+      'GOOGLE_SECRET',
+    ), // Don't worry - not truly a secret! See 'Client Secret Requirements'
+    scopes: scopes,
+  ),
+);
 
 final scopes = [
-  'email',
-  'profile',
-  'https://www.googleapis.com/auth/gmail.readonly',
-  'https://www.googleapis.com/auth/gmail.modify',
-  'https://www.googleapis.com/auth/gmail.send',
+  GmailApi.gmailComposeScope,
+  GmailApi.gmailInsertScope,
+  GmailApi.gmailReadonlyScope,
+  GmailApi.gmailLabelsScope,
+  GmailApi.gmailModifyScope,
+  GmailApi.gmailMetadataScope,
+  GmailApi.gmailSendScope,
+  PeopleServiceApi.contactsReadonlyScope,
+  PeopleServiceApi.userEmailsReadScope,
+  PeopleServiceApi.userinfoProfileScope,
+  PeopleServiceApi.userinfoEmailScope,
 ];
 
 final userProvider = FutureProvider<USER?>((ref) async {
@@ -29,49 +49,48 @@ Future<USER> auth(bool firstTime, String? token) async {
 }
 
 Future<void> loginWithGoogle(BuildContext context) async {
-  await googleSignIn.initialize(
-    clientId: Platform.isAndroid
-        ? "954214301039-tmkatt15fvvdgb73rohcmcm3vu0s11df.apps.googleusercontent.com"
-        : Platform.isIOS
-        ? "954214301039-t7tvo7h1denqb7mdhg832etpsaop9ni5.apps.googleusercontent.com"
-        : Platform.isWindows || Platform.isMacOS || Platform.isLinux
-        ? "954214301039-sqn057nkl3p0uemog300fpigblhlap2c.apps.googleusercontent.com"
-        : "954214301039-h68aeiokkdhp57efvrq98k90csj502gs.apps.googleusercontent.com",
-    serverClientId:
-        "954214301039-s0ja0vfk1uvu9mqvpndoatnvvjtdg8ea.apps.googleusercontent.com",
-  );
-  var user = await googleSignIn.authenticate(scopeHint: scopes);
-
-  final authorization = await user.authorizationClient.authorizationForScopes(
-    scopes,
-  );
-  String accessToken;
-
-  if (authorization != null) {
-    accessToken = authorization.accessToken;
+  if (kIsWeb) {
   } else {
-    final auth = await user.authorizationClient.authorizeScopes(scopes);
-    accessToken = auth.accessToken;
+    final cred = await googleSignIn.signInOnline();
+    final client = await googleSignIn.authenticatedClient;
+    if (client == null || cred == null) {
+      log(
+        client == null && cred == null
+            ? "both null"
+            : client == null
+            ? "client null"
+            : "cred null",
+      );
+      return;
+    }
+    final peopleApi = PeopleServiceApi(client);
+    final person = await peopleApi.people.get(
+      'people/me',
+      personFields: "names,emailAddresses,photos",
+    );
+    String? email = person.emailAddresses![0].value;
+    String? name = person.names![0].displayName;
+    String? photoUrl = person.photos![0].url;
+
+    await setCustomCookie(
+      Uri.parse(BACKEND_URL + "/auth/login/"),
+      cred.accessToken,
+      "accessToken",
+    );
+
+    var res = await login(
+      name != null ? name : "no name",
+      email!,
+      photoUrl != null ? photoUrl : "no photo",
+      "google",
+      cred.accessToken,
+    );
+    String token = res.data;
+
+    USER finalUser = await auth(false, token);
+    userProvider.overrideWithValue(AsyncValue.data(finalUser));
+    context.go('/');
   }
-
-  await setCustomCookie(
-    Uri.parse(BACKEND_URL + "/auth/login/"),
-    accessToken,
-    "accessToken",
-  );
-
-  var res = await login(
-    user.displayName != null ? user.displayName! : "no name",
-    user.email,
-    user.photoUrl != null ? user.photoUrl! : "no photo",
-    "google",
-    accessToken,
-  );
-  String token = res.data;
-
-  USER finalUser = await auth(false, token);
-  userProvider.overrideWithValue(AsyncValue.data(finalUser));
-  context.go('/');
 }
 
 Future<void> logoutUser() async {
