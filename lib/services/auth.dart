@@ -15,10 +15,14 @@ import 'package:googleapis/gmail/v1.dart';
 final googleSignIn = GoogleSignIn(
   // See 'How to Get Google OAuth Credentials' section below
   params: GoogleSignInParams(
-    clientId: dotenv.get("GOOGLE_CLIENT_ID"),
-    clientSecret: dotenv.get(
-      'GOOGLE_SECRET',
-    ), // Don't worry - not truly a secret! See 'Client Secret Requirements'
+    clientId: kReleaseMode
+        ? String.fromEnvironment("GOOGLE_CLIENT_ID")
+        : dotenv.get("GOOGLE_CLIENT_ID"),
+    clientSecret: kReleaseMode
+        ? String.fromEnvironment('GOOGLE_SECRET')
+        : dotenv.get(
+            'GOOGLE_SECRET',
+          ), // Don't worry - not truly a secret! See 'Client Secret Requirements'
     scopes: scopes,
   ),
 );
