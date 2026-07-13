@@ -33,6 +33,7 @@ Future<Response> login(
   String email,
   String photoUrl,
   String oAuthProvider,
+  String accessToken,
 ) async {
   _dio.options.headers['Content-Type'] = 'application/json';
   final res = await _dio.post(
@@ -42,6 +43,7 @@ Future<Response> login(
       "email": email,
       "photoUrl": photoUrl,
       "oAuthProvider": oAuthProvider,
+      "accessToken": accessToken,
     },
   );
 

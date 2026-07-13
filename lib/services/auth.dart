@@ -55,7 +55,7 @@ Future<void> loginWithGoogle(BuildContext context) async {
   }
 
   await setCustomCookie(
-    Uri.parse(BACKEND_URL + "/auth/login"),
+    Uri.parse(BACKEND_URL + "/auth/login/"),
     accessToken,
     "accessToken",
   );
@@ -65,6 +65,7 @@ Future<void> loginWithGoogle(BuildContext context) async {
     user.email,
     user.photoUrl != null ? user.photoUrl! : "no photo",
     "google",
+    accessToken,
   );
   String token = res.data;
 
