@@ -24,9 +24,13 @@ class _LoginPageState extends State<LoginPage> {
       loginWithGoogle(context)
           .onError((err, trace) {
             log(err.toString());
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text("something went wrong")));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: kReleaseMode
+                    ? Text("something went wrong")
+                    : Text(err.toString()),
+              ),
+            );
           })
           .whenComplete(() {
             setState(() {
@@ -35,9 +39,13 @@ class _LoginPageState extends State<LoginPage> {
           })
           .catchError((err, trace) {
             log(err.toString());
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text("something went wrong")));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: kReleaseMode
+                    ? Text("something went wrong")
+                    : Text(err.toString()),
+              ),
+            );
           })
           .then((value) {});
     }

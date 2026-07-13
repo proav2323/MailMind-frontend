@@ -1,5 +1,6 @@
 import 'package:MailMind/services/api.dart';
 import 'package:MailMind/theme.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:MailMind/pages/home.dart';
@@ -8,8 +9,11 @@ import 'package:MailMind/pages/login.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
-  await dotenv.load();
   runApp(ProviderScope(child: MyApp()));
+  // if (kReleaseMode == false) {
+  //   await dotenv.load(fileName: '.env');
+  // }
+  await dotenv.load(fileName: '.env');
   await initApi();
 }
 
