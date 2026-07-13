@@ -26,7 +26,7 @@ class _LoginPageState extends State<LoginPage> {
             log(err.toString());
             ScaffoldMessenger.of(
               context,
-            ).showSnackBar(SnackBar(content: Text(err.toString())));
+            ).showSnackBar(SnackBar(content: Text("something went wrong")));
           })
           .whenComplete(() {
             setState(() {
@@ -37,7 +37,7 @@ class _LoginPageState extends State<LoginPage> {
             log(err.toString());
             ScaffoldMessenger.of(
               context,
-            ).showSnackBar(SnackBar(content: Text(err.toString())));
+            ).showSnackBar(SnackBar(content: Text("something went wrong")));
           })
           .then((value) {});
     }
