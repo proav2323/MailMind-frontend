@@ -77,14 +77,12 @@ class _MyHomePageState extends State<MyHomePage> {
       builder: (context, ref, child) {
         return Scaffold(
           appBar: widget.user == null
-              ? CustomAppBar(title: "MailMind")
-              : UserAppBar(
-                  title: "MailMind",
-                  actions: [
-                    IconButton(onPressed: () {}, icon: Icon(Icons.search)),
-                  ],
-                  user: widget.user!,
-                ),
+              ? screenWidth >= 900
+                    ? CustomAppBar(title: "MailMind")
+                    : CustomAppBar(title: "MailMind")
+              : screenWidth >= 900
+              ? UserAppBar(title: "MailMind", actions: [], user: widget.user!)
+              : UserAppBar(title: "MailMind", actions: [], user: widget.user!),
           body: widget.isLaoding == true
               ? Center(child: CircularProgressIndicator())
               : widget.user != null
