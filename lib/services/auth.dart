@@ -44,8 +44,10 @@ final userProvider = FutureProvider<USER?>((ref) async {
 Future<USER> auth(bool firstTime, String? token) async {
   if (firstTime == false) {
     await setCustomCookie(Uri.parse(BACKEND_URL + "/auth/"), token!, "token");
+    return getUserProfile();
+  } else {
+    return getUserProfile();
   }
-  return getUserProfile();
 }
 
 Future<void> loginToDatabase(
