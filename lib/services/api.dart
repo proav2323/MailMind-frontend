@@ -17,7 +17,7 @@ Future<void> initApi() async {
   _dio = Dio(BaseOptions(baseUrl: BACKEND_URL));
 
   if (kIsWeb || Platform.isWindows) {
-    var _cookieJarr = CookieJar();
+    var _cookieJarr = PersistCookieJar();
     _cookieJar = _cookieJarr;
 
     _dio.interceptors.add(CookieManager(_cookieJar));
