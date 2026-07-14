@@ -1,31 +1,38 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:MailMind/models/user.dart';
 
 late Dio _dio;
-late PersistCookieJar _cookieJar;
+dynamic _cookieJar;
 final BACKEND_URL = 'https://mailmind-backend.vercel.app';
 // final BACKEND_URL = 'http://10.0.2.2:3000';
 
 Future<void> initApi() async {
   _dio = Dio(BaseOptions(baseUrl: BACKEND_URL));
 
-  // 1. Get a safe directory on the device to save cookie files
-  final directory = await getApplicationDocumentsDirectory();
-  final cookiePath = '${directory.path}/.cookies/';
+  if (kIsWeb || Platform.isWindows) {
+    var _cookieJarr = CookieJar();
+    _cookieJar = _cookieJarr;
 
-  // 2. Initialize the persistent cookie jar
-  _cookieJar = PersistCookieJar(
-    storage: FileStorage(cookiePath),
-    ignoreExpires: false, // Set to true if you want to bypass expiration dates
-  );
+    _dio.interceptors.add(CookieManager(_cookieJar));
+  } else {
+    final directory = await getApplicationDocumentsDirectory();
+    final cookiePath = '${directory.path}/.cookies/';
 
-  // 3. Attach the CookieManager interceptor to Dio
-  _dio.interceptors.add(CookieManager(_cookieJar));
+    var _cookieJarr = PersistCookieJar(
+      storage: FileStorage(cookiePath),
+      ignoreExpires: false,
+    );
+    _cookieJar = _cookieJarr;
+
+    _dio.interceptors.add(CookieManager(_cookieJar));
+  }
 }
 
 Future<Response> login(
@@ -35,6 +42,9 @@ Future<Response> login(
   String oAuthProvider,
   String accessToken,
 ) async {
+  if (_cookieJar == null) {
+    await initApi();
+  }
   _dio.options.headers['Content-Type'] = 'application/json';
   final res = await _dio.post(
     '/auth/login',
@@ -51,31 +61,46 @@ Future<Response> login(
 }
 
 Future<USER> getUserProfile() async {
+  if (_cookieJar == null) {
+    await initApi();
+  }
   final response = await _dio.get('/auth');
   return USER.fromJson(response.data!);
 }
 
 Future<List<Cookie>> getCookies(Uri url) async {
-  return await _cookieJar.loadForRequest(url);
+  if (_cookieJar == null) {
+    await initApi();
+  }
+  return await _cookieJar!.loadForRequest(url);
 }
 
 // Manually store a brand new cookie
 Future<void> setCustomCookie(Uri url, String value, String name) async {
+  if (_cookieJar == null) {
+    await initApi();
+  }
   List<Cookie> cookies = [
     Cookie(name, value)
       ..domain = BACKEND_URL
       ..path = "/"
       ..httpOnly = true,
   ];
-  await _cookieJar.saveFromResponse(url, cookies);
+  await _cookieJar!.saveFromResponse(url, cookies);
 }
 
 // Delete all stored cookies (Useful for Logging Out)
 Future<void> clearAllCookies() async {
-  await _cookieJar.deleteAll();
+  if (_cookieJar == null) {
+    await initApi();
+  }
+  await _cookieJar!.deleteAll();
 }
 
 Future<void> logout() async {
+  if (_cookieJar == null) {
+    await initApi();
+  }
   await _dio.put("");
   await clearAllCookies();
 }

@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:MailMind/services/api.dart';
 import 'package:MailMind/theme.dart';
@@ -11,6 +12,7 @@ import 'package:MailMind/pages/login.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
+  if (kIsWeb || Platform.isWindows) {}
   runApp(ProviderScope(child: MyApp()));
   await initApi();
 }

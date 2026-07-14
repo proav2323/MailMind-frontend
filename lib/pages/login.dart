@@ -59,24 +59,35 @@ class _LoginPageState extends State<LoginPage> {
       isLoading = false;
     });
     if (kIsWeb) {
+      log("web working");
       googleSignIn.authenticationState.listen(
         (GoogleSignInCredentials? cred) {
           setState(() {
             isLoading = true;
           });
           loginToDatabase(cred, context)
-              .then((value) {})
+              .then((value) {
+                log("done");
+                setState(() {
+                  isLoading = false;
+                });
+              })
               .onError((err, trace) {
+                log("error");
+                setState(() {
+                  isLoading = false;
+                });
+                double screenWidth = MediaQuery.of(context).size.width;
+                log(err.toString());
                 SnackBar(
+                  behavior: SnackBarBehavior.floating,
+                  width: screenWidth > 900
+                      ? screenWidth * 0.5
+                      : screenWidth * 0.9,
                   content: kReleaseMode
                       ? Text("something went wrong")
                       : Text(err.toString()),
                 );
-              })
-              .whenComplete(() {
-                setState(() {
-                  isLoading = false;
-                });
               });
         },
         onError: (err) {
