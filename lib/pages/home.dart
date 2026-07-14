@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:MailMind/components/UserAppBar.dart';
 import 'package:MailMind/components/appbar.dart';
 import 'package:MailMind/services/auth.dart';
 import 'package:MailMind/services/config.dart';
@@ -71,10 +72,17 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     return Consumer(
       builder: (context, ref, child) {
         return Scaffold(
-          appBar: CustomAppBar(title: "MailMind"),
+          appBar: widget.user == null
+              ? screenWidth >= 900
+                    ? CustomAppBar(title: "MailMind")
+                    : CustomAppBar(title: "MailMind")
+              : screenWidth >= 900
+              ? UserAppBar(title: "MailMind", actions: [], user: widget.user!)
+              : UserAppBar(title: "MailMind", actions: [], user: widget.user!),
           body: widget.isLaoding == true
               ? Center(child: CircularProgressIndicator())
               : widget.user != null

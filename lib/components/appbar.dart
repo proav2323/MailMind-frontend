@@ -1,16 +1,18 @@
+import 'package:MailMind/models/user.dart';
+import 'package:MailMind/services/api.dart';
+import 'package:MailMind/services/auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
-  final List<Widget>? actions;
 
   // Pass data into the component via the constructor
-  const CustomAppBar({super.key, required this.title, this.actions});
+  const CustomAppBar({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
-    final route = GoRouterState.of(context).matchedLocation;
     return AppBar(
       backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -19,7 +21,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         onPressed: () => {},
         icon: ImageIcon(AssetImage('assets/MailMind-logo.png'), size: 100),
       ),
-      actions: actions,
+      actions: [],
     );
   }
 

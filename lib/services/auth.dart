@@ -48,53 +48,61 @@ Future<USER> auth(bool firstTime, String? token) async {
   return getUserProfile();
 }
 
+Future<void> loginToDatabase(
+  GoogleSignInCredentials? cred,
+  BuildContext context,
+) async {
+  final client = await googleSignIn.authenticatedClient;
+  if (client == null || cred == null) {
+    log(
+      client == null && cred == null
+          ? "both null"
+          : client == null
+          ? "client null"
+          : "cred null",
+    );
+    return;
+  }
+  final peopleApi = PeopleServiceApi(client);
+  final person = await peopleApi.people.get(
+    'people/me',
+    personFields: "names,emailAddresses,photos",
+  );
+  String? email = person.emailAddresses![0].value;
+  String? name = person.names![0].displayName;
+  String? photoUrl = person.photos![0].url;
+
+  await setCustomCookie(
+    Uri.parse(BACKEND_URL + "/auth/login/"),
+    cred.accessToken,
+    "accessToken",
+  );
+
+  var res = await login(
+    name != null ? name : "no name",
+    email!,
+    photoUrl != null ? photoUrl : "no photo",
+    "google",
+    cred.accessToken,
+  );
+  String token = res.data;
+
+  USER finalUser = await auth(false, token);
+  userProvider.overrideWithValue(AsyncValue.data(finalUser));
+  context.go('/');
+}
+
 Future<void> loginWithGoogle(BuildContext context) async {
   if (kIsWeb) {
   } else {
     final cred = await googleSignIn.signInOnline();
-    final client = await googleSignIn.authenticatedClient;
-    if (client == null || cred == null) {
-      log(
-        client == null && cred == null
-            ? "both null"
-            : client == null
-            ? "client null"
-            : "cred null",
-      );
-      return;
-    }
-    final peopleApi = PeopleServiceApi(client);
-    final person = await peopleApi.people.get(
-      'people/me',
-      personFields: "names,emailAddresses,photos",
-    );
-    String? email = person.emailAddresses![0].value;
-    String? name = person.names![0].displayName;
-    String? photoUrl = person.photos![0].url;
-
-    await setCustomCookie(
-      Uri.parse(BACKEND_URL + "/auth/login/"),
-      cred.accessToken,
-      "accessToken",
-    );
-
-    var res = await login(
-      name != null ? name : "no name",
-      email!,
-      photoUrl != null ? photoUrl : "no photo",
-      "google",
-      cred.accessToken,
-    );
-    String token = res.data;
-
-    USER finalUser = await auth(false, token);
-    userProvider.overrideWithValue(AsyncValue.data(finalUser));
-    context.go('/');
+    await loginToDatabase(cred, context);
   }
 }
 
-Future<void> logoutUser() async {
+Future<void> logoutUser(BuildContext context) async {
   await googleSignIn.signOut();
-  await logout();
+  await clearAllCookies();
   userProvider.overrideWithValue(AsyncValue.data(null));
+  context.go("/login");
 }
