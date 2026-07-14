@@ -58,47 +58,6 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       isLoading = false;
     });
-    if (kIsWeb) {
-      log("web working");
-      googleSignIn.authenticationState.listen(
-        (GoogleSignInCredentials? cred) {
-          setState(() {
-            isLoading = true;
-          });
-          loginToDatabase(cred, context)
-              .then((value) {
-                log("done");
-                setState(() {
-                  isLoading = false;
-                });
-              })
-              .onError((err, trace) {
-                log("error");
-                setState(() {
-                  isLoading = false;
-                });
-                double screenWidth = MediaQuery.of(context).size.width;
-                log(err.toString());
-                SnackBar(
-                  behavior: SnackBarBehavior.floating,
-                  width: screenWidth > 900
-                      ? screenWidth * 0.5
-                      : screenWidth * 0.9,
-                  content: kReleaseMode
-                      ? Text("something went wrong")
-                      : Text(err.toString()),
-                );
-              });
-        },
-        onError: (err) {
-          SnackBar(
-            content: kReleaseMode
-                ? Text("something went wrong")
-                : Text(err.toString()),
-          );
-        },
-      );
-    }
     super.initState();
   }
 
@@ -151,7 +110,42 @@ class _LoginPageState extends State<LoginPage> {
                     child: kIsWeb
                         ? isLoading
                               ? Center(child: CircularProgressIndicator())
-                              : googleSignIn.signInButton()
+                              : googleSignIn.signInButton(
+                                  config: GSIAPButtonConfig(
+                                    onSignIn: (cred) {
+                                      setState(() {
+                                        isLoading = true;
+                                      });
+                                      loginToDatabase(cred, context)
+                                          .then((value) {
+                                            log("done");
+                                            setState(() {
+                                              isLoading = false;
+                                            });
+                                          })
+                                          .onError((err, trace) {
+                                            log("error");
+                                            setState(() {
+                                              isLoading = false;
+                                            });
+                                            double screenWidth = MediaQuery.of(
+                                              context,
+                                            ).size.width;
+                                            log(err.toString());
+                                            SnackBar(
+                                              behavior:
+                                                  SnackBarBehavior.floating,
+                                              width: screenWidth > 900
+                                                  ? screenWidth * 0.5
+                                                  : screenWidth * 0.9,
+                                              content: kReleaseMode
+                                                  ? Text("something went wrong")
+                                                  : Text(err.toString()),
+                                            );
+                                          });
+                                    },
+                                  ),
+                                )
                         : ElevatedButton(
                             onPressed: () => loginUser(),
                             style: ButtonStyle(
