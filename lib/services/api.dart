@@ -7,9 +7,11 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:MailMind/models/user.dart';
+import 'package:dio/browser.dart'; // Web-specific adapter
+import 'package:web/web.dart' as web;
 
 late Dio _dio;
-dynamic _cookieJar;
+PersistCookieJar? _cookieJar;
 final BACKEND_URL = 'https://mailmind-backend.vercel.app';
 // final BACKEND_URL = 'http://10.0.2.2:3000';
 
@@ -17,10 +19,10 @@ Future<void> initApi() async {
   _dio = Dio(BaseOptions(baseUrl: BACKEND_URL));
 
   if (kIsWeb || Platform.isWindows) {
-    var _cookieJarr = PersistCookieJar();
-    _cookieJar = _cookieJarr;
+    final adapter = BrowserHttpClientAdapter();
+    adapter.withCredentials = true;
 
-    _dio.interceptors.add(CookieManager(_cookieJar));
+    _dio.httpClientAdapter = adapter;
   } else {
     final directory = await getApplicationDocumentsDirectory();
     final cookiePath = '${directory.path}/.cookies/';
@@ -31,7 +33,7 @@ Future<void> initApi() async {
     );
     _cookieJar = _cookieJarr;
 
-    _dio.interceptors.add(CookieManager(_cookieJar));
+    _dio.interceptors.add(CookieManager(_cookieJar!));
   }
 }
 
@@ -72,21 +74,63 @@ Future<List<Cookie>> getCookies(Uri url) async {
   if (_cookieJar == null) {
     await initApi();
   }
-  return await _cookieJar!.loadForRequest(url);
+  if (kIsWeb || Platform.isWindows) {
+    final Map<String, String> cookieMap = {};
+
+    // Access the document object via the window context
+    final String cookieString = web.window.document.cookie;
+
+    if (cookieString.isEmpty) {
+      return [];
+    }
+
+    final List<String> cookiesS = cookieString.split(';');
+    List<Cookie> cookies = [];
+    cookiesS.forEach((cookie) {
+      final List<String> parts = cookie.split('=');
+      if (parts.length >= 2) {
+        final String key = parts[0].trim();
+        // Join remaining elements in case the value contains '=' signs
+        final String value = parts.sublist(1).join('=').trim();
+        cookies.add(
+          Cookie(key, value)
+            ..domain = BACKEND_URL
+            ..path = "/"
+            ..httpOnly = false,
+        );
+      }
+    });
+    return cookies;
+  } else {
+    return await _cookieJar!.loadForRequest(url);
+  }
 }
 
 // Manually store a brand new cookie
-Future<void> setCustomCookie(Uri url, String value, String name) async {
+Future<void> setCustomCookie(
+  Uri url,
+  String value,
+  String name,
+  int days,
+) async {
   if (_cookieJar == null) {
     await initApi();
   }
-  List<Cookie> cookies = [
-    Cookie(name, value)
-      ..domain = BACKEND_URL
-      ..path = "/"
-      ..httpOnly = true,
-  ];
-  await _cookieJar!.saveFromResponse(url, cookies);
+  if (kIsWeb || Platform.isWindows) {
+    final expires = DateTime.now().add(Duration(days: days)).toUtc();
+
+    // Construct cookie string
+    web.document.cookie =
+        "$name=$value; expires=${expires.toIso8601String()}; Domain=${BACKEND_URL + url.path}; Path=/; SameSite=Lax; Secure";
+  } else {
+    List<Cookie> cookies = [
+      Cookie(name, value)
+        ..domain = BACKEND_URL
+        ..path = "/"
+        ..httpOnly = false,
+    ];
+    await _cookieJar!.saveFromResponse(url, cookies);
+  }
 }
 
 // Delete all stored cookies (Useful for Logging Out)
