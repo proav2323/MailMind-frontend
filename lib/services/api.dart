@@ -7,8 +7,6 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:MailMind/models/user.dart';
-import 'package:dio/browser.dart'; // Web-specific adapter
-import 'package:web/web.dart' as web;
 
 late Dio _dio;
 PersistCookieJar? _cookieJar;
@@ -19,10 +17,6 @@ Future<void> initApi() async {
   _dio = Dio(BaseOptions(baseUrl: BACKEND_URL));
 
   if (kIsWeb || Platform.isWindows) {
-    final adapter = BrowserHttpClientAdapter();
-    adapter.withCredentials = true;
-
-    _dio.httpClientAdapter = adapter;
   } else {
     final directory = await getApplicationDocumentsDirectory();
     final cookiePath = '${directory.path}/.cookies/';
@@ -75,32 +69,7 @@ Future<List<Cookie>> getCookies(Uri url) async {
     await initApi();
   }
   if (kIsWeb || Platform.isWindows) {
-    final Map<String, String> cookieMap = {};
-
-    // Access the document object via the window context
-    final String cookieString = web.window.document.cookie;
-
-    if (cookieString.isEmpty) {
-      return [];
-    }
-
-    final List<String> cookiesS = cookieString.split(';');
-    List<Cookie> cookies = [];
-    cookiesS.forEach((cookie) {
-      final List<String> parts = cookie.split('=');
-      if (parts.length >= 2) {
-        final String key = parts[0].trim();
-        // Join remaining elements in case the value contains '=' signs
-        final String value = parts.sublist(1).join('=').trim();
-        cookies.add(
-          Cookie(key, value)
-            ..domain = BACKEND_URL
-            ..path = "/"
-            ..httpOnly = false,
-        );
-      }
-    });
-    return cookies;
+    return [];
   } else {
     return await _cookieJar!.loadForRequest(url);
   }
@@ -117,11 +86,6 @@ Future<void> setCustomCookie(
     await initApi();
   }
   if (kIsWeb || Platform.isWindows) {
-    final expires = DateTime.now().add(Duration(days: days)).toUtc();
-
-    // Construct cookie string
-    web.document.cookie =
-        "$name=$value; expires=${expires.toIso8601String()}; Domain=${BACKEND_URL + url.path}; Path=/; SameSite=Lax; Secure";
   } else {
     List<Cookie> cookies = [
       Cookie(name, value)
