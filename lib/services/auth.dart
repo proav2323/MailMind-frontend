@@ -1,27 +1,16 @@
-import 'dart:developer';
-import 'package:MailMind/models/user.dart';
-import 'package:MailMind/services/api.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_sign_in_all_platforms/google_sign_in_all_platforms.dart';
-import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'dart:io';
+import 'dart:developer';
 import 'package:googleapis/people/v1.dart';
 import 'package:googleapis/gmail/v1.dart';
-import 'package:MailMind/services/config.dart';
+import 'package:mailmind/models/user.dart';
+import 'package:mailmind/services/config.dart';
+import 'package:mailmind/services/api.dart';
 
-// final GoogleSignIn googleSignIn = GoogleSignIn.instance;
-final googleSignIn = GoogleSignIn(
-  // See 'How to Get Google OAuth Credentials' section below
-  params: GoogleSignInParams(
-    clientId: CONFIGAPIKEYS.GOOGLE_CLINET_ID,
-    clientSecret: CONFIGAPIKEYS
-        .GOOGLE_SECRET, // Don't worry - not truly a secret! See 'Client Secret Requirements'
-    scopes: scopes,
-  ),
-);
+final GoogleSignIn googleSignIn = GoogleSignIn.instance;
 
 final scopes = [
   GmailApi.gmailComposeScope,
@@ -49,49 +38,46 @@ Future<USER> auth(bool firstTime, String? token) async {
       "token",
       1,
     );
-    return getUserProfile();
-  } else {
-    return getUserProfile();
   }
+  return getUserProfile();
 }
 
-Future<void> loginToDatabase(
-  GoogleSignInCredentials? cred,
-  BuildContext context,
-) async {
-  final client = await googleSignIn.authenticatedClient;
-  if (client == null || cred == null) {
-    log(
-      client == null && cred == null
-          ? "both null"
-          : client == null
-          ? "client null"
-          : "cred null",
-    );
-    return;
-  }
-  final peopleApi = PeopleServiceApi(client);
-  final person = await peopleApi.people.get(
-    'people/me',
-    personFields: "names,emailAddresses,photos",
+Future<void> loginWithGoogle(BuildContext context) async {
+  await googleSignIn.initialize(
+    clientId: Platform.isAndroid
+        ? CONFIGAPIKEYS.GOOGLE_ANDRIOD_CLIENT_ID
+        : Platform.isIOS
+        ? CONFIGAPIKEYS.GOOGLE_IOS_CLIENT_ID
+        : "",
+    serverClientId: CONFIGAPIKEYS.GOOGLE_CLINET_ID,
   );
-  String? email = person.emailAddresses![0].value;
-  String? name = person.names![0].displayName;
-  String? photoUrl = person.photos![0].url;
+  var user = await googleSignIn.authenticate(scopeHint: scopes);
+
+  final authorization = await user.authorizationClient.authorizationForScopes(
+    scopes,
+  );
+  String accessToken;
+
+  if (authorization != null) {
+    accessToken = authorization.accessToken;
+  } else {
+    final auth = await user.authorizationClient.authorizeScopes(scopes);
+    accessToken = auth.accessToken;
+  }
 
   await setCustomCookie(
-    Uri.parse(BACKEND_URL + "/auth/login/"),
-    cred.accessToken,
+    Uri.parse(BACKEND_URL + "/auth/login"),
+    accessToken,
     "accessToken",
     1,
   );
 
   var res = await login(
-    name != null ? name : "no name",
-    email!,
-    photoUrl != null ? photoUrl : "no photo",
+    user.displayName != null ? user.displayName! : "no name",
+    user.email,
+    user.photoUrl != null ? user.photoUrl! : "no photo",
     "google",
-    cred.accessToken,
+    accessToken,
   );
   String token = res.data;
 
@@ -100,17 +86,8 @@ Future<void> loginToDatabase(
   context.go('/');
 }
 
-Future<void> loginWithGoogle(BuildContext context) async {
-  if (kIsWeb) {
-  } else {
-    final cred = await googleSignIn.signInOnline();
-    await loginToDatabase(cred, context);
-  }
-}
-
-Future<void> logoutUser(BuildContext context) async {
+Future<void> logoutUser() async {
   await googleSignIn.signOut();
-  await clearAllCookies();
+  await logout();
   userProvider.overrideWithValue(AsyncValue.data(null));
-  context.go("/login");
 }

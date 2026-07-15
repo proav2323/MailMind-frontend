@@ -1,4 +1,4 @@
-import 'package:MailMind/models/user.dart';
+import 'package:mailmind/models/user.dart';
 
 class EMAIL {
   final String id;

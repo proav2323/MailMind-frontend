@@ -1,12 +1,11 @@
 import 'dart:developer';
 
-import 'package:MailMind/components/UserAppBar.dart';
-import 'package:MailMind/services/auth.dart';
-import 'package:MailMind/services/config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:MailMind/models/user.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mailmind/components/UserAppBar.dart';
+import 'package:mailmind/models/user.dart';
+import 'package:mailmind/services/auth.dart';
 
 class MyHomePage extends StatefulWidget {
   USER? user;
@@ -19,7 +18,6 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   void init() {
-    log(CONFIGAPIKEYS.GOOGLE_SECRET);
     final container = ProviderContainer();
     container.listen(
       userProvider,
@@ -89,7 +87,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ],
                     user: widget.user!,
-                    showPopup: true,
                   ),
             body: widget.isLaoding == true
                 ? Center(child: CircularProgressIndicator())

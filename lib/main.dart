@@ -1,15 +1,14 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:MailMind/services/api.dart';
-import 'package:MailMind/theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:MailMind/pages/home.dart';
 import 'package:go_router/go_router.dart';
-import 'package:MailMind/pages/login.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:mailmind/pages/login.dart';
+import 'package:mailmind/services/api.dart';
+import 'package:mailmind/pages/home.dart';
 
 void main() async {
   if (kIsWeb || Platform.isWindows) {}

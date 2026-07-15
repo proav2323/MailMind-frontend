@@ -1,6 +1,6 @@
-import 'package:MailMind/models/emails.dart';
-import 'package:MailMind/models/notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:mailmind/models/emails.dart';
+import 'package:mailmind/models/notifications.dart';
 
 class USER {
   final String id;

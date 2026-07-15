@@ -1,9 +1,8 @@
 import 'dart:developer';
-import 'package:MailMind/services/auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_sign_in_all_platforms/google_sign_in_all_platforms.dart';
+import 'package:mailmind/services/auth.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
