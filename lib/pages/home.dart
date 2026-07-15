@@ -1,5 +1,5 @@
 import 'dart:developer';
-
+import 'package:mailmind/components/Drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -88,6 +88,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     ],
                     user: widget.user!,
                   ),
+            drawer: UserMainAppDrawer(
+              actions: [],
+              title: "",
+              user: widget.user!,
+            ),
             body: widget.isLaoding == true
                 ? Center(child: CircularProgressIndicator())
                 : widget.user != null
