@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:MailMind/components/UserAppBar.dart';
-import 'package:MailMind/components/appbar.dart';
 import 'package:MailMind/services/auth.dart';
 import 'package:MailMind/services/config.dart';
 import 'package:flutter/material.dart';
@@ -73,23 +72,56 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Consumer(
       builder: (context, ref, child) {
-        return Scaffold(
-          appBar: widget.user == null
-              ? CustomAppBar(title: "MailMind")
-              : UserAppBar(
-                  title: "MailMind",
-                  actions: [
-                    IconButton(onPressed: () {}, icon: Icon(Icons.search)),
-                  ],
-                  user: widget.user!,
-                ),
-          body: widget.isLaoding == true
-              ? Center(child: CircularProgressIndicator())
-              : widget.user != null
-              ? Text(widget.user!.name)
-              : Text("something went wrong"),
+        return SafeArea(
+          child: Scaffold(
+            appBar: widget.user == null
+                ? null
+                : UserAppBar(
+                    title: "",
+                    actions: [
+                      IconButton(onPressed: () {}, icon: Icon(Icons.search)),
+                      IconButton(
+                        onPressed: () {},
+                        icon: Icon(Icons.notifications),
+                      ),
+                    ],
+                    user: widget.user!,
+                    showPopup: true,
+                  ),
+            body: widget.isLaoding == true
+                ? Center(child: CircularProgressIndicator())
+                : widget.user != null
+                ? Center(
+                    child: SizedBox(
+                      width: screenWidth * 0.90,
+                      child: ListView(
+                        children: [
+                          SizedBox(height: 20),
+                          Text(
+                            "Hello, ${widget.user!.name} 👋",
+                            style: TextStyle(
+                              fontSize: 25,
+                              fontStyle: FontStyle.normal,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            "Here's what's important today",
+                            style: TextStyle(
+                              color: isDarkMode
+                                  ? Colors.blueGrey
+                                  : Colors.white70,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : Text("something went wrong"),
+          ),
         );
       },
     );

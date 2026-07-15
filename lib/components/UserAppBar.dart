@@ -9,6 +9,7 @@ class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final List<Widget> actions;
   final USER user;
+  final bool showPopup;
 
   // Pass data into the component via the constructor
   const UserAppBar({
@@ -16,48 +17,49 @@ class UserAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.title,
     required this.actions,
     required this.user,
+    required this.showPopup,
   });
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-      elevation: 4,
-      leading: IconButton(
-        onPressed: () => {},
-        icon: ImageIcon(AssetImage('assets/MailMind-logo.png'), size: 100),
-      ),
-      actions: [
-        ...actions,
-        PopupMenuButton(
-          offset: const Offset(
-            0,
-            56,
-          ), // Positions dropdown directly below the AppBar
-          child: Padding(
-            padding: EdgeInsets.all(8.0),
-            child: CircleAvatar(backgroundImage: NetworkImage(user.photoUrl)),
-          ),
-          itemBuilder: (BuildContext context) {
-            return [
-              const PopupMenuItem<String>(
-                value: 'settings',
-                child: Text('Settings'),
+      centerTitle: true,
+      leading: IconButton(onPressed: () => {}, icon: Icon(Icons.menu)),
+      actions: showPopup
+          ? [
+              ...actions,
+              PopupMenuButton(
+                offset: const Offset(
+                  0,
+                  56,
+                ), // Positions dropdown directly below the AppBar
+                child: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: CircleAvatar(
+                    backgroundImage: NetworkImage(user.photoUrl),
+                  ),
+                ),
+                itemBuilder: (BuildContext context) {
+                  return [
+                    const PopupMenuItem<String>(
+                      value: 'settings',
+                      child: Text('Settings'),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: 'logout',
+                      child: Text('Logout'),
+                    ),
+                  ];
+                },
+                onSelected: (String value) {
+                  if (value == 'logout') {
+                    logoutUser(context);
+                  }
+                },
               ),
-              const PopupMenuItem<String>(
-                value: 'logout',
-                child: Text('Logout'),
-              ),
-            ];
-          },
-          onSelected: (String value) {
-            if (value == 'logout') {
-              logoutUser(context);
-            }
-          },
-        ),
-      ],
+            ]
+          : actions,
     );
   }
 

@@ -34,8 +34,42 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       title: 'MailMind',
       themeMode: ThemeMode.system,
-      darkTheme: AppTheme.darkTheme,
-      theme: AppTheme.lightTheme,
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        colorScheme: const ColorScheme.dark(
+          surface: Color(0xFF212121), // Very dark gray (Colors.grey[900])
+          surfaceContainer: Color(
+            0xFF303030,
+          ), // Medium dark gray (Colors.grey[850])
+          primary: Colors.blue, // Accent color
+        ),
+        scaffoldBackgroundColor: const Color(0xFF121212),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF121212),
+          // foregroundColor: Colors.white,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+        ),
+        cardTheme: CardThemeData(color: Color(0xFF1E1E1E), elevation: 2),
+      ),
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: const ColorScheme.dark(
+          surface: Color(0xFF212121), // Very dark gray (Colors.grey[900])
+          surfaceContainer: Color(
+            0xFF303030,
+          ), // Medium dark gray (Colors.grey[850])
+          primary: Colors.blue, // Accent color
+        ),
+        scaffoldBackgroundColor: const Color(0xFF121212),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF121212),
+          // foregroundColor: Colors.white,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+        ),
+        cardTheme: CardThemeData(color: Color(0xFF1E1E1E), elevation: 2),
+      ),
       routerConfig: _router,
     );
   }

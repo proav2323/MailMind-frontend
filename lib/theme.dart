@@ -10,9 +10,10 @@ class AppTheme {
     ),
     scaffoldBackgroundColor: const Color(0xFFF8F9FA),
     appBarTheme: const AppBarTheme(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.transparent,
       foregroundColor: Colors.black,
       elevation: 0,
+      scrolledUnderElevation: 0,
     ),
     cardTheme: CardThemeData(color: Colors.white, elevation: 2),
   );
@@ -29,9 +30,10 @@ class AppTheme {
     ),
     scaffoldBackgroundColor: const Color(0xFF121212),
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFF1E1E1E),
-      foregroundColor: Colors.white,
-      elevation: 2,
+      backgroundColor: Color(0xFF121212),
+      // foregroundColor: Colors.white,
+      elevation: 0,
+      scrolledUnderElevation: 0,
     ),
     cardTheme: CardThemeData(color: Color(0xFF1E1E1E), elevation: 2),
   );
