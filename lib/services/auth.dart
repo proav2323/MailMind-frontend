@@ -88,13 +88,6 @@ Future<void> loginWithGoogle(BuildContext context) async {
     1,
   );
 
-  await setCustomCookie(
-    Uri.parse(BACKEND_URL + "/auth/login"),
-    userScopes.toString(),
-    "userScopes",
-    1,
-  );
-
   var res = await login(
     user.displayName != null ? user.displayName! : "no name",
     user.email,
