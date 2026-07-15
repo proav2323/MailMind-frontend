@@ -1,3 +1,4 @@
+import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -57,12 +58,20 @@ Future<void> loginWithGoogle(BuildContext context) async {
     scopes,
   );
   String accessToken;
+  String? refreshToken;
+  List<String> userScopes;
 
   if (authorization != null) {
-    accessToken = authorization.accessToken;
+    var auth = authorization.authClient(scopes: scopes).credentials;
+    refreshToken = auth.refreshToken;
+    accessToken = auth.accessToken.data;
+    userScopes = auth.scopes;
   } else {
     final auth = await user.authorizationClient.authorizeScopes(scopes);
-    accessToken = auth.accessToken;
+    var authClient = auth.authClient(scopes: scopes).credentials;
+    accessToken = authClient.accessToken.data;
+    refreshToken = authClient.refreshToken;
+    userScopes = authClient.scopes;
   }
 
   await setCustomCookie(
@@ -72,12 +81,28 @@ Future<void> loginWithGoogle(BuildContext context) async {
     1,
   );
 
+  await setCustomCookie(
+    Uri.parse(BACKEND_URL + "/auth/login"),
+    refreshToken ?? "",
+    "refreshToken",
+    1,
+  );
+
+  await setCustomCookie(
+    Uri.parse(BACKEND_URL + "/auth/login"),
+    userScopes.toString(),
+    "userScopes",
+    1,
+  );
+
   var res = await login(
     user.displayName != null ? user.displayName! : "no name",
     user.email,
     user.photoUrl != null ? user.photoUrl! : "no photo",
     "google",
     accessToken,
+    refreshToken,
+    userScopes,
   );
   String token = res.data;
 

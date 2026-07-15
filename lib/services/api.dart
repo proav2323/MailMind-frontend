@@ -37,6 +37,8 @@ Future<Response> login(
   String photoUrl,
   String oAuthProvider,
   String accessToken,
+  String? refreshToken,
+  List<String> userScopes,
 ) async {
   if (_cookieJar == null) {
     await initApi();
@@ -50,6 +52,8 @@ Future<Response> login(
       "photoUrl": photoUrl,
       "oAuthProvider": oAuthProvider,
       "accessToken": accessToken,
+      "refreshToken": refreshToken,
+      "scopes": userScopes,
     },
   );
 
