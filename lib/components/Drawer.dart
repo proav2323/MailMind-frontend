@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mailmind/models/user.dart';
+import 'package:go_router/go_router.dart';
 
 class UserMainAppDrawer extends StatelessWidget implements Widget {
   final String title;
-  final List<Map<String, dynamic>> actions;
+  final List<Widget> actions;
   final USER user;
 
   // Pass data into the component via the constructor
@@ -16,25 +17,73 @@ class UserMainAppDrawer extends StatelessWidget implements Widget {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Drawer(
       child: Column(
         children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(color: Colors.blue),
+          DrawerHeader(
+            decoration: BoxDecoration(
+              color: isDarkMode == true ? Colors.black87 : Colors.blueGrey,
+            ),
             child: Center(
-              child: Text(
-                'Fixed Drawer Header',
-                style: TextStyle(color: Colors.white, fontSize: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 70,
+                        child: CircleAvatar(
+                          backgroundImage: NetworkImage(user.photoUrl),
+                        ),
+                      ),
+                      SizedBox(height: 0, width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(user.name),
+                            Text(
+                              user.email,
+                              style: TextStyle(
+                                color: isDarkMode
+                                    ? Colors.grey
+                                    : Colors.black87,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {},
+                          child: Text("logout"),
+                        ),
+                      ),
+                      SizedBox(height: 0, width: 10),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {},
+                          child: Text("logout"),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),
           Expanded(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: const [
-                ListTile(leading: Icon(Icons.home), title: Text('Home')),
-              ],
-            ),
+            child: ListView(padding: EdgeInsets.zero, children: actions),
           ),
         ],
       ),

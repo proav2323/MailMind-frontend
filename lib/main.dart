@@ -18,6 +18,7 @@ void main() async {
 
 // GoRouter configuration
 final _router = GoRouter(
+  initialLocation: '/',
   routes: [
     GoRoute(path: '/', builder: (context, state) => MyHomePage()),
     GoRoute(path: '/login', builder: (context, state) => LoginPage()),

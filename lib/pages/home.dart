@@ -71,6 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    String route = GoRouterState.of(context).uri.toString();
     return Consumer(
       builder: (context, ref, child) {
         return SafeArea(
@@ -86,13 +87,24 @@ class _MyHomePageState extends State<MyHomePage> {
                         icon: Icon(Icons.notifications),
                       ),
                     ],
-                    user: widget.user!,
                   ),
-            drawer: UserMainAppDrawer(
-              actions: [],
-              title: "",
-              user: widget.user!,
-            ),
+            drawer: widget.user != null
+                ? UserMainAppDrawer(
+                    actions: [
+                      ListTile(
+                        leading: Icon(Icons.home),
+                        title: Text('Home'),
+                        selected: route == '/',
+                        selectedColor: isDarkMode
+                            ? Colors.grey
+                            : Colors.blueAccent,
+                        onTap: () {},
+                      ),
+                    ],
+                    title: "",
+                    user: widget.user!,
+                  )
+                : null,
             body: widget.isLaoding == true
                 ? Center(child: CircularProgressIndicator())
                 : widget.user != null
