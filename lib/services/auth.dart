@@ -43,7 +43,7 @@ Future<USER> auth(bool firstTime, String? token) async {
   return getUserProfile();
 }
 
-Future<void> loginWithGoogle(BuildContext context) async {
+Future<void> initGoogle() async {
   await googleSignIn.initialize(
     clientId: Platform.isAndroid
         ? CONFIGAPIKEYS.GOOGLE_ANDRIOD_CLIENT_ID
@@ -52,27 +52,42 @@ Future<void> loginWithGoogle(BuildContext context) async {
         : "",
     serverClientId: CONFIGAPIKEYS.GOOGLE_CLINET_ID,
   );
+}
+
+Future<void> loginWithGoogle(BuildContext context) async {
   var user = await googleSignIn.authenticate(scopeHint: scopes);
 
   final authorization = await user.authorizationClient.authorizationForScopes(
     scopes,
   );
   String accessToken;
-  String? refreshToken;
+  String serverAuthCode;
   List<String> userScopes;
 
   if (authorization != null) {
     var auth = authorization.authClient(scopes: scopes).credentials;
-    refreshToken = auth.refreshToken;
+    var server = await user.authorizationClient.authorizeServer(scopes);
+    if (server == null) {
+      serverAuthCode = "no token";
+    } else {
+      serverAuthCode = server.serverAuthCode;
+    }
     accessToken = auth.accessToken.data;
     userScopes = auth.scopes;
   } else {
     final auth = await user.authorizationClient.authorizeScopes(scopes);
     var authClient = auth.authClient(scopes: scopes).credentials;
     accessToken = authClient.accessToken.data;
-    refreshToken = authClient.refreshToken;
+    var server = await user.authorizationClient.authorizeServer(scopes);
+    if (server == null) {
+      serverAuthCode = "no token";
+    } else {
+      serverAuthCode = server.serverAuthCode;
+    }
     userScopes = authClient.scopes;
   }
+
+  log(serverAuthCode);
 
   await setCustomCookie(
     Uri.parse(BACKEND_URL + "/auth/login"),
@@ -83,7 +98,7 @@ Future<void> loginWithGoogle(BuildContext context) async {
 
   await setCustomCookie(
     Uri.parse(BACKEND_URL + "/auth/login"),
-    refreshToken ?? "",
+    serverAuthCode ?? "",
     "refreshToken",
     1,
   );
@@ -94,7 +109,7 @@ Future<void> loginWithGoogle(BuildContext context) async {
     user.photoUrl != null ? user.photoUrl! : "no photo",
     "google",
     accessToken,
-    refreshToken,
+    serverAuthCode,
     userScopes,
   );
   String token = res.data;
@@ -104,8 +119,9 @@ Future<void> loginWithGoogle(BuildContext context) async {
   context.go('/');
 }
 
-Future<void> logoutUser() async {
+Future<void> logoutUser(BuildContext context) async {
   await googleSignIn.signOut();
-  await logout();
+  await clearAllCookies();
   userProvider.overrideWithValue(AsyncValue.data(null));
+  context.go("/login");
 }

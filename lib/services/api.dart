@@ -37,7 +37,7 @@ Future<Response> login(
   String photoUrl,
   String oAuthProvider,
   String accessToken,
-  String? refreshToken,
+  String serverAuthCode,
   List<String> userScopes,
 ) async {
   if (_cookieJar == null) {
@@ -52,7 +52,7 @@ Future<Response> login(
       "photoUrl": photoUrl,
       "oAuthProvider": oAuthProvider,
       "accessToken": accessToken,
-      "refreshToken": refreshToken,
+      "serverAuthCode": serverAuthCode,
       "scopes": userScopes,
     },
   );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mailmind/models/user.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mailmind/services/auth.dart';
 
 class UserMainAppDrawer extends StatelessWidget implements Widget {
   final String title;
@@ -65,7 +66,7 @@ class UserMainAppDrawer extends StatelessWidget implements Widget {
                     children: [
                       Expanded(
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () => logoutUser(context),
                           child: Text("logout"),
                         ),
                       ),
