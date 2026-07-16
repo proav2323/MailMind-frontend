@@ -10,6 +10,7 @@ import 'package:googleapis/gmail/v1.dart';
 import 'package:mailmind/models/user.dart';
 import 'package:mailmind/services/config.dart';
 import 'package:mailmind/services/api.dart';
+import 'package:mailmind/services/sharedPref.dart';
 
 final GoogleSignIn googleSignIn = GoogleSignIn.instance;
 
@@ -87,22 +88,6 @@ Future<void> loginWithGoogle(BuildContext context) async {
     userScopes = authClient.scopes;
   }
 
-  log(serverAuthCode);
-
-  await setCustomCookie(
-    Uri.parse(BACKEND_URL + "/auth/login"),
-    accessToken,
-    "accessToken",
-    1,
-  );
-
-  await setCustomCookie(
-    Uri.parse(BACKEND_URL + "/auth/login"),
-    serverAuthCode ?? "",
-    "refreshToken",
-    1,
-  );
-
   var res = await login(
     user.displayName != null ? user.displayName! : "no name",
     user.email,
@@ -112,6 +97,7 @@ Future<void> loginWithGoogle(BuildContext context) async {
     serverAuthCode,
     userScopes,
   );
+  await addItem("accessToken", accessToken);
   String token = res.data;
 
   USER finalUser = await auth(false, token);
