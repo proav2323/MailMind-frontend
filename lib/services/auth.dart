@@ -15,11 +15,8 @@ import 'package:mailmind/services/sharedPref.dart';
 final GoogleSignIn googleSignIn = GoogleSignIn.instance;
 
 final scopes = [
-  GmailApi.gmailComposeScope,
-  GmailApi.gmailInsertScope,
   GmailApi.gmailReadonlyScope,
   GmailApi.gmailModifyScope,
-  GmailApi.gmailSendScope,
   "https://mail.google.com/",
   PeopleServiceApi.contactsReadonlyScope,
   PeopleServiceApi.userEmailsReadScope,
