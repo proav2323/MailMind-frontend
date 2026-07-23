@@ -95,7 +95,6 @@ Future<void> loginWithGoogle(BuildContext context) async {
   );
   await addItem("accessToken", accessToken);
   String token = res.data;
-
   USER finalUser = await auth(false, token);
   userProvider.overrideWithValue(AsyncValue.data(finalUser));
   context.go('/');

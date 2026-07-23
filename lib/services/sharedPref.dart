@@ -26,7 +26,8 @@ Future<void> deleteItem(String key) async {
   await sharedPref.remove(key);
 }
 
-Future<void> getItem(String key) async {
+Future<Object?> getItem(String key) async {
   var sharedPref = await SharedPreferences.getInstance();
-  await sharedPref.get(key);
+  Object? data = sharedPref.get(key);
+  return data;
 }

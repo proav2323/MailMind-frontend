@@ -7,6 +7,7 @@ import 'package:mailmind/pages/login.dart';
 import 'package:mailmind/services/api.dart';
 import 'package:mailmind/pages/home.dart';
 import 'package:mailmind/services/auth.dart';
+import 'package:mailmind/pages/year.dart';
 
 void main() async {
   if (kIsWeb || Platform.isWindows) {}
@@ -21,6 +22,7 @@ final _router = GoRouter(
   routes: [
     GoRoute(path: '/', builder: (context, state) => MyHomePage()),
     GoRoute(path: '/login', builder: (context, state) => LoginPage()),
+    GoRoute(path: "/year", builder: (context, state) => yearSelect()),
   ],
 );
 
