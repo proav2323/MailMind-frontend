@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mailmind/components/UserAppBar.dart';
 import 'package:mailmind/models/user.dart';
+import 'package:mailmind/services/api.dart';
+import 'package:mailmind/services/auth.dart';
 import 'package:mailmind/services/sharedPref.dart';
 
 class yearSelect extends StatefulWidget {
@@ -39,9 +41,9 @@ class _yearSelectState extends State<yearSelect> {
         widget.isLaoding = true;
       });
       await addItem("year", widget.date.year.toString());
-      // get fetch emails for first time with year
-      // get user from auth and chaneg provider state
-      // then go to home
+      await getNewEmails(true);
+      USER user = await auth(true, null);
+      userProvider.overrideWithValue(AsyncValue.data(user));
       setState(() {
         widget.isLaoding = false;
       });

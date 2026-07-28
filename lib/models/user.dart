@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:mailmind/models/emails.dart';
 import 'package:mailmind/models/notifications.dart';
@@ -30,13 +32,12 @@ class USER {
     required List<dynamic> emails,
     required List<dynamic> notifications,
   }) {
-    emails.forEach((email) {
-      this.emails.add(EMAIL.fromJson(email));
-    });
-
-    notifications.forEach((email) {
-      this.notifications.add(NOTIFICATIONS.fromJson(email));
-    });
+    for (int i = 0; i < emails.length; i++) {
+      this.emails.add(EMAIL.fromJson(emails[i]));
+    }
+    for (int i = 0; i < notifications.length; i++) {
+      this.notifications.add(NOTIFICATIONS.fromJson(notifications[i]));
+    }
   }
 
   factory USER.fromJson(Map<String, Object?> json) {

@@ -7,6 +7,7 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mailmind/models/user.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:mailmind/services/sharedPref.dart';
 
 late Dio _dio;
 PersistCookieJar? _cookieJar;
@@ -107,6 +108,17 @@ Future<void> clearAllCookies() async {
     await initApi();
   }
   await _cookieJar!.deleteAll();
+}
+
+Future<void> getNewEmails(bool first) async {
+  if (_cookieJar == null) {
+    await initApi();
+  }
+  _dio.options.headers['Content-Type'] = 'application/json';
+  _dio.options.headers['first'] = first;
+  String? year = await getItem("year") as String?;
+  _dio.options.headers['year'] = year;
+  final res = await _dio.get('/emails');
 }
 
 Future<void> logout() async {

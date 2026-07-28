@@ -8,12 +8,12 @@ class EMAIL {
   final String sender;
   final String summary;
   final String priority;
-  final String body;
+  final Map body;
   final String category;
-  DateTime deadline;
+  DateTime? deadline;
   DateTime receivedAt;
   bool isRead;
-  USER User;
+  USER? User;
 
   EMAIL({
     required this.id,
@@ -28,22 +28,40 @@ class EMAIL {
     required this.isRead,
     required this.deadline,
     required this.receivedAt,
-    required this.User,
-  }) {}
+    required User,
+  }) {
+    Map<String, dynamic> data = {
+      "emails": [],
+      "notifications": [],
+      "id": User['id'],
+      "name": User['name'],
+      "email": User['email'],
+      "branch": null,
+      "college": null,
+      "oAuthProvider": User['oAuthProvider'],
+      "photoUrl": User['photoUrl'],
+      "year": null,
+      "updated_at": User['updated_at'],
+      "created_at": User['created_at'],
+    };
+    this.User = USER.fromJson(data);
+  }
 
   factory EMAIL.fromJson(Map<String, Object?> json) {
     return EMAIL(
       userId: json['userId'] as String,
       id: json['id'] as String,
-      gmailId: json['gamilId'] as String,
+      gmailId: json['gmailId'] as String,
       sender: json['sender'] as String,
       summary: json['summary'] as String,
       category: json['category'] as String,
       isRead: json['isRead'] as bool,
-      body: json['body'] as String,
-      deadline: DateTime.parse(json['deadline'].toString()),
+      body: json['body'] as Map,
+      deadline: json['deadline'] == null || json['deadline'] == 'null'
+          ? null
+          : DateTime.parse(json['deadline'].toString()),
       receivedAt: DateTime.parse(json['receivedAt'].toString()),
-      User: json['User'] as USER,
+      User: json['User'],
       priority: json['priority'] as String,
       subject: json['subject'] as String,
     );

@@ -29,6 +29,8 @@ class _MyHomePageState extends State<MyHomePage> {
               widget.isLaoding = false;
               widget.user = null;
             });
+            log(err.toString());
+            log(trace.toString());
             context.go("/login");
           },
           data: (value) async {
@@ -40,7 +42,6 @@ class _MyHomePageState extends State<MyHomePage> {
               context.go("/login");
             }
             Object? year = await getItem("year");
-            log(year.toString());
             if (year == null || year == "" || year == " ") {
               context.go('/year');
             }
