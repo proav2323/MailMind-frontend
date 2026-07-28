@@ -110,12 +110,11 @@ Future<void> clearAllCookies() async {
   await _cookieJar!.deleteAll();
 }
 
-Future<void> getNewEmails(bool first) async {
+Future<void> getNewEmails() async {
   if (_cookieJar == null) {
     await initApi();
   }
   _dio.options.headers['Content-Type'] = 'application/json';
-  _dio.options.headers['first'] = first;
   String? year = await getItem("year") as String?;
   _dio.options.headers['year'] = year;
   final res = await _dio.get('/emails');

@@ -41,7 +41,7 @@ class _yearSelectState extends State<yearSelect> {
         widget.isLaoding = true;
       });
       await addItem("year", widget.date.year.toString());
-      await getNewEmails(true);
+      await getNewEmails();
       USER user = await auth(true, null);
       userProvider.overrideWithValue(AsyncValue.data(user));
       setState(() {
