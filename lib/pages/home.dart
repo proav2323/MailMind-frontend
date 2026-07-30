@@ -7,6 +7,7 @@ import 'package:mailmind/components/UserAppBar.dart';
 import 'package:mailmind/models/user.dart';
 import 'package:mailmind/services/auth.dart';
 import 'package:mailmind/services/sharedPref.dart';
+import 'package:mailmind/services/api.dart';
 
 class MyHomePage extends StatefulWidget {
   USER? user;
@@ -34,16 +35,29 @@ class _MyHomePageState extends State<MyHomePage> {
             context.go("/login");
           },
           data: (value) async {
-            setState(() {
-              widget.isLaoding = false;
-              widget.user = value;
-            });
             if (value == null) {
+              setState(() {
+                widget.isLaoding = false;
+                widget.user = value;
+              });
               context.go("/login");
             }
             Object? year = await getItem("year");
             if (year == null || year == "" || year == " ") {
+              setState(() {
+                widget.isLaoding = false;
+                widget.user = value;
+              });
               context.go('/year');
+            }
+            if (value != null && year != null && year != "" && year != " ") {
+              await getNewEmails();
+              USER user = await auth(true, null);
+              userProvider.overrideWithValue(AsyncValue.data(user));
+              setState(() {
+                widget.user = user;
+                widget.isLaoding = false;
+              });
             }
           },
           loading: () {
