@@ -110,7 +110,7 @@ Future<void> clearAllCookies() async {
   await _cookieJar!.deleteAll();
 }
 
-Future<void> getNewEmails() async {
+Future<Response<dynamic>> getNewEmails() async {
   if (_cookieJar == null) {
     await initApi();
   }
@@ -118,6 +118,7 @@ Future<void> getNewEmails() async {
   String? year = await getItem("year") as String?;
   _dio.options.headers['year'] = year;
   final res = await _dio.get('/emails');
+  return res;
 }
 
 Future<void> logout() async {

@@ -8,6 +8,7 @@ import 'package:mailmind/models/user.dart';
 import 'package:mailmind/services/auth.dart';
 import 'package:mailmind/services/sharedPref.dart';
 import 'package:mailmind/services/api.dart';
+import 'package:dio/dio.dart';
 
 class MyHomePage extends StatefulWidget {
   USER? user;
@@ -51,7 +52,15 @@ class _MyHomePageState extends State<MyHomePage> {
               context.go('/year');
             }
             if (value != null && year != null && year != "" && year != " ") {
-              await getNewEmails();
+              try {
+                Response<dynamic> data = await getNewEmails();
+              } on DioException catch (e) {
+                log(e.toString());
+                setState(() {
+                  widget.user = null;
+                  widget.isLaoding = false;
+                });
+              }
               USER user = await auth(true, null);
               userProvider.overrideWithValue(AsyncValue.data(user));
               setState(() {
