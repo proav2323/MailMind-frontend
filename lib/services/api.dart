@@ -5,7 +5,9 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mailmind/models/user.dart';
+import 'package:mailmind/services/socket.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:mailmind/services/sharedPref.dart';
 
@@ -66,6 +68,14 @@ Future<USER> getUserProfile() async {
     await initApi();
   }
   final response = await _dio.get('/auth');
+  SocketService socketService = SocketService();
+  List<Cookie> tokenList = await getCookies(Uri.parse(BACKEND_URL + "/auth/"));
+  int tokenIndex = tokenList.indexWhere((cookie) => cookie.name == "token");
+  if (tokenIndex == -1) {
+    throw Exception('Token not found in cookies');
+  }
+  socketService.initSocket(tokenList[tokenIndex].value);
+  SOCKET.overrideWithValue(AsyncValue.data(socketService));
   return USER.fromJson(response.data!);
 }
 
