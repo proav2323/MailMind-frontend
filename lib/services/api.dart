@@ -68,14 +68,6 @@ Future<USER> getUserProfile() async {
     await initApi();
   }
   final response = await _dio.get('/auth');
-  SocketService socketService = SocketService();
-  List<Cookie> tokenList = await getCookies(Uri.parse(BACKEND_URL + "/auth/"));
-  int tokenIndex = tokenList.indexWhere((cookie) => cookie.name == "token");
-  if (tokenIndex == -1) {
-    throw Exception('Token not found in cookies');
-  }
-  socketService.initSocket(tokenList[tokenIndex].value);
-  SOCKET.overrideWithValue(AsyncValue.data(socketService));
   return USER.fromJson(response.data!);
 }
 
