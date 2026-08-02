@@ -11,6 +11,7 @@ import 'package:mailmind/models/user.dart';
 import 'package:mailmind/services/config.dart';
 import 'package:mailmind/services/api.dart';
 import 'package:mailmind/services/sharedPref.dart';
+import 'package:mailmind/services/socket.dart';
 
 final GoogleSignIn googleSignIn = GoogleSignIn.instance;
 
@@ -97,6 +98,9 @@ Future<void> loginWithGoogle(BuildContext context) async {
   String token = res.data;
   USER finalUser = await auth(false, token);
   userProvider.overrideWithValue(AsyncValue.data(finalUser));
+  SocketService socketService = SocketService();
+  socketService.initSocket(token);
+  SOCKET.overrideWithValue(AsyncValue.data(socketService));
   context.go('/');
 }
 
