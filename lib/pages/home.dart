@@ -1,7 +1,6 @@
 import 'dart:developer';
 import 'package:mailmind/components/Drawer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mailmind/components/UserAppBar.dart';
 import 'package:mailmind/models/user.dart';
@@ -9,6 +8,8 @@ import 'package:mailmind/services/auth.dart';
 import 'package:mailmind/services/sharedPref.dart';
 import 'package:mailmind/services/api.dart';
 import 'package:dio/dio.dart';
+import 'package:mailmind/services/socket.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class MyHomePage extends StatefulWidget {
   USER? user;
@@ -101,8 +102,20 @@ class _MyHomePageState extends State<MyHomePage> {
     double screenWidth = MediaQuery.of(context).size.width;
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     String route = GoRouterState.of(context).uri.toString();
+
     return Consumer(
       builder: (context, ref, child) {
+        AsyncValue<SocketService> socketService = ref.watch(SOCKET);
+
+        initState() {
+          super.initState();
+          socketService.whenData((socket) {
+            socket.socket.on('connect', (_) {});
+
+            socket.socket.on('disconnect', (_) {});
+          });
+        }
+
         return SafeArea(
           child: Scaffold(
             appBar: widget.user == null

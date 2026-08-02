@@ -10,7 +10,6 @@ import 'package:mailmind/services/auth.dart';
 import 'package:mailmind/pages/year.dart';
 
 void main() async {
-  if (kIsWeb || Platform.isWindows) {}
   runApp(ProviderScope(child: MyApp()));
   await initApi();
   await initGoogle();
