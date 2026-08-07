@@ -106,16 +106,11 @@ class _MyHomePageState extends State<MyHomePage> {
     return Consumer(
       builder: (context, ref, child) {
         AsyncValue<SocketService> socketService = ref.watch(SOCKET);
+        socketService.whenData((socket) {
+          socket.socket.on('connect', (_) {});
 
-        initState() {
-          super.initState();
-          socketService.whenData((socket) {
-            socket.socket.on('connect', (_) {});
-
-            socket.socket.on('disconnect', (_) {});
-          });
-        }
-
+          socket.socket.on('disconnect', (_) {});
+        });
         return SafeArea(
           child: Scaffold(
             appBar: widget.user == null

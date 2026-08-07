@@ -47,4 +47,8 @@ class SocketService {
     socket.onDisconnect((_) => print('Connection disconnected'));
     socket.onConnectError((data) => print('Connection error: $data'));
   }
+
+  void disconnectSocket() {
+    socket.disconnect();
+  }
 }
