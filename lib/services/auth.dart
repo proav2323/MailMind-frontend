@@ -22,7 +22,7 @@ final scopes = [
   PeopleServiceApi.contactsReadonlyScope,
   PeopleServiceApi.userEmailsReadScope,
   PeopleServiceApi.userinfoProfileScope,
-  PeopleServiceApi.userinfoEmailScope,
+  PeopleServiceApi.userPhonenumbersReadScope,
 ];
 
 final userProvider = FutureProvider<USER?>((ref) async {
