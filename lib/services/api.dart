@@ -10,10 +10,12 @@ import 'package:mailmind/models/user.dart';
 import 'package:mailmind/services/socket.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:mailmind/services/sharedPref.dart';
+import 'package:http/http.dart' as http;
 
 late Dio _dio;
 PersistCookieJar? _cookieJar;
 const BACKEND_URL = 'https://mailmind-backend-d5ip.onrender.com';
+const AI_BACKEND_URL = 'https://mailmind-ai-vjnm.onrender.com';
 // final BACKEND_URL = 'http://10.0.2.2:3000';
 
 Future<void> initApi() async {
@@ -112,10 +114,17 @@ Future<void> clearAllCookies() async {
   await _cookieJar!.deleteAll();
 }
 
+Future<void> wakeAiService() async {
+  final uri = Uri.parse(AI_BACKEND_URL + "/");
+  final res = await http.get(uri);
+  return;
+}
+
 Future<Response<dynamic>> getNewEmails() async {
   if (_cookieJar == null) {
     await initApi();
   }
+  wakeAiService();
   _dio.options.headers['Content-Type'] = 'application/json';
   String? year = await getItem("year") as String?;
   _dio.options.headers['year'] = year;
