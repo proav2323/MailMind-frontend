@@ -37,7 +37,6 @@ class SocketService {
           .setQuery({"platfrom": "mobile"})
           .build(),
     );
-
     socket.connect();
 
     // Handle connection lifecycle
