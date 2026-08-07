@@ -34,7 +34,7 @@ class SocketService {
           .disableAutoConnect() // Better control over connection lifecycle
           .setAuth({'token': token}) // Optional authentication
           .setExtraHeaders({'token': token}) // Optional headers
-          .setQuery({"platfrom": "mobile"})
+          .setQuery({"platform": "mobile"})
           .build(),
     );
 
