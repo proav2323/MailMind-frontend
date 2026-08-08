@@ -1,11 +1,12 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mailmind/components/socketLifeCycle.dart';
 import 'package:mailmind/services/api.dart';
 import 'package:mailmind/services/auth.dart';
+import 'package:mailmind/services/firebase.dart';
 
 void main() async {
+  await initFirebaseApp();
   runApp(ProviderScope(child: MyApp()));
   await initApi();
   await initGoogle();

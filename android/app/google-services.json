@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "1019970178825",
+    "project_id": "mailmind-4ca8e",
+    "storage_bucket": "mailmind-4ca8e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1019970178825:android:157bfb38f72ddfff5b0dd8",
+        "android_client_info": {
+          "package_name": "com.example.mailmind_frontend"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1019970178825-2l1tjdvl0nh1rj40ishi5lsobemts78l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyChMcS6KMmYVDVB71sSIKhooqyHbc4fgYo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1019970178825-2l1tjdvl0nh1rj40ishi5lsobemts78l.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1019970178825-5bh5b4a405agjcmsld8iookldbhpmo7b.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.mailmindFrontend"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

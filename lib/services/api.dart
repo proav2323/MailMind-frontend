@@ -7,6 +7,7 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mailmind/models/user.dart';
+import 'package:mailmind/services/firebase.dart';
 import 'package:mailmind/services/socket.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:mailmind/services/sharedPref.dart';
@@ -138,4 +139,18 @@ Future<void> logout() async {
   }
   await _dio.put("");
   await clearAllCookies();
+}
+
+Future<void> saveFid() async {
+  if (_cookieJar == null) {
+    await initApi();
+  }
+  String? fid = await getFirebaseInstallationId();
+  if (fid == null) {
+    log("fid is hull");
+  } else {
+    _dio.options.headers['fid'] = fid;
+    _dio.options.headers['platform'] = kIsWeb ? "web" : "mobile";
+    await _dio.get('/auth/save');
+  }
 }
