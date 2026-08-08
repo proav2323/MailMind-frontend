@@ -4,12 +4,17 @@ import 'package:mailmind/components/socketLifeCycle.dart';
 import 'package:mailmind/services/api.dart';
 import 'package:mailmind/services/auth.dart';
 import 'package:mailmind/services/firebase.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {}
 
 void main() async {
   runApp(ProviderScope(child: MyApp()));
   await initApi();
   await initGoogle();
   await initFirebaseApp();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 }
 
 // GoRouter configuration

@@ -1,10 +1,14 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mailmind/services/firebase.dart';
 import 'package:mailmind/services/socket.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mailmind/pages/home.dart';
 import 'package:mailmind/pages/year.dart';
 import 'package:mailmind/pages/login.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class SocketLifecycleManager extends StatefulWidget {
   SocketService? SOCKET;
@@ -21,11 +25,45 @@ class _SocketLifecycleManagerState extends State<SocketLifecycleManager> {
   void initState() {
     super.initState();
     getSocket();
+    listenMsg();
+    if (msg != null) {
+      msg!.getNotificationSettings().then(
+        (val) => {
+          if (val.authorizationStatus == AuthorizationStatus.notDetermined)
+            {
+              msg!
+                  .requestPermission(
+                    alert: true,
+                    announcement: false,
+                    badge: true,
+                    carPlay: false,
+                    criticalAlert: false,
+                    provisional: false,
+                    sound: true,
+                  )
+                  .then((value) => {}),
+            }
+          else if (val.authorizationStatus == AuthorizationStatus.denied)
+            {log("denied")},
+        },
+      );
+    }
+
     _lifecycleListener = AppLifecycleListener(
       onHide: () => _disconnectSocket(),
       onDetach: () => _disconnectSocket(),
       onInactive: () => _disconnectSocket(),
     );
+  }
+
+  void listenMsg() {
+    FirebaseMessaging.onMessage.listen((payload) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(payload.notification!.title ?? "you have anew email"),
+        ),
+      );
+    });
   }
 
   void _disconnectSocket() {
