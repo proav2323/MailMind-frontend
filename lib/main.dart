@@ -6,10 +6,10 @@ import 'package:mailmind/services/auth.dart';
 import 'package:mailmind/services/firebase.dart';
 
 void main() async {
-  await initFirebaseApp();
   runApp(ProviderScope(child: MyApp()));
   await initApi();
   await initGoogle();
+  await initFirebaseApp();
 }
 
 // GoRouter configuration
