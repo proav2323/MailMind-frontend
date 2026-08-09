@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mailmind/services/firebase.dart';
@@ -26,28 +24,6 @@ class _SocketLifecycleManagerState extends State<SocketLifecycleManager> {
     super.initState();
     getSocket();
     listenMsg();
-    if (msg != null) {
-      msg!.getNotificationSettings().then(
-        (val) => {
-          if (val.authorizationStatus == AuthorizationStatus.notDetermined)
-            {
-              msg!
-                  .requestPermission(
-                    alert: true,
-                    announcement: false,
-                    badge: true,
-                    carPlay: false,
-                    criticalAlert: false,
-                    provisional: false,
-                    sound: true,
-                  )
-                  .then((value) => {}),
-            }
-          else if (val.authorizationStatus == AuthorizationStatus.denied)
-            {log("denied")},
-        },
-      );
-    }
 
     _lifecycleListener = AppLifecycleListener(
       onHide: () => _disconnectSocket(),

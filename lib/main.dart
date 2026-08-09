@@ -5,16 +5,40 @@ import 'package:mailmind/services/api.dart';
 import 'package:mailmind/services/auth.dart';
 import 'package:mailmind/services/firebase.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'dart:developer';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {}
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initFirebaseApp();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  intilaizeMsg();
+  if (msg != null) {
+    log("running");
+    msg!.getNotificationSettings().then((val) {
+      log(val.authorizationStatus.toString());
+      if (val.authorizationStatus == AuthorizationStatus.notDetermined) {
+        msg!
+            .requestPermission(
+              alert: true,
+              announcement: false,
+              badge: true,
+              carPlay: false,
+              criticalAlert: false,
+              provisional: false,
+              sound: true,
+            )
+            .then((value) => {log("not asked")});
+      } else if (val.authorizationStatus == AuthorizationStatus.denied) {
+        log("denied");
+      }
+    });
+  }
   runApp(ProviderScope(child: MyApp()));
   await initApi();
   await initGoogle();
-  await initFirebaseApp();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 }
 
 // GoRouter configuration

@@ -12,7 +12,11 @@ Future<void> initFirebaseApp() async {
   app = await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+}
+
+void intilaizeMsg() {
   msg = FirebaseMessaging.instance;
+  log("intaizing msg");
 }
 
 Future<String?> getFirebaseInstallationId() async {
