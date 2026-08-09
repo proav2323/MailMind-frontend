@@ -7,17 +7,33 @@ class NOTIFICATIONS {
   final String body;
   final DateTime scheduledTime;
   final bool isSent;
-  final USER User;
+  USER? User;
 
   NOTIFICATIONS({
-    required this.User,
+    required dynamic User,
     required this.id,
     required this.body,
     required this.isSent,
     required this.scheduledTime,
     required this.title,
     required this.userId,
-  });
+  }) {
+    Map<String, dynamic> data = {
+      "emails": [],
+      "notifications": [],
+      "id": User['id'],
+      "name": User['name'],
+      "email": User['email'],
+      "branch": null,
+      "college": null,
+      "oAuthProvider": User['oAuthProvider'],
+      "photoUrl": User['photoUrl'],
+      "year": null,
+      "updated_at": User['updated_at'],
+      "created_at": User['created_at'],
+    };
+    this.User = USER.fromJson(data);
+  }
 
   factory NOTIFICATIONS.fromJson(Map<String, Object?> json) {
     return NOTIFICATIONS(
@@ -27,7 +43,7 @@ class NOTIFICATIONS {
       title: json['title'] as String,
       body: json['body'] as String,
       scheduledTime: DateTime.parse(json['scheduledTime'].toString()),
-      User: json['User'] as USER,
+      User: json['User'],
     );
   }
 }
