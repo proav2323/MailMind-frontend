@@ -30,21 +30,21 @@ class EMAIL {
     required this.receivedAt,
     required User,
   }) {
-    Map<String, dynamic> data = {
-      "emails": [],
-      "notifications": [],
-      "id": User['id'],
-      "name": User['name'],
-      "email": User['email'],
-      "branch": null,
-      "college": null,
-      "oAuthProvider": User['oAuthProvider'],
-      "photoUrl": User['photoUrl'],
-      "year": null,
-      "updated_at": User['updated_at'],
-      "created_at": User['created_at'],
-    };
-    this.User = USER.fromJson(data);
+    // Map<String, dynamic> data = {
+    //   "emails": [],
+    //   "notifications": [],
+    //   "id": User['id'],
+    //   "name": User['name'],
+    //   "email": User['email'],
+    //   "branch": null,
+    //   "college": null,
+    //   "oAuthProvider": User['oAuthProvider'],
+    //   "photoUrl": User['photoUrl'],
+    //   "year": null,
+    //   "updated_at": User['updated_at'],
+    //   "created_at": User['created_at'],
+    // };
+    this.User = null;
   }
 
   factory EMAIL.fromJson(Map<String, Object?> json) {
@@ -61,7 +61,7 @@ class EMAIL {
           ? null
           : DateTime.parse(json['deadline'].toString()),
       receivedAt: DateTime.parse(json['receivedAt'].toString()),
-      User: json['User'],
+      User: null,
       priority: json['priority'] as String,
       subject: json['subject'] as String,
     );

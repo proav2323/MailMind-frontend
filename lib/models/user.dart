@@ -52,8 +52,8 @@ class USER {
       id: json['id'] as String,
       updated_at: DateTime.parse(json['updated_at'] as String),
       created_at: DateTime.parse(json['created_at'] as String),
-      emails: json['emails'] as List<dynamic>,
-      notifications: json['notifications'] as List<dynamic>,
+      emails: [],
+      notifications: [],
     );
   }
 }

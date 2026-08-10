@@ -18,21 +18,21 @@ class NOTIFICATIONS {
     required this.title,
     required this.userId,
   }) {
-    Map<String, dynamic> data = {
-      "emails": [],
-      "notifications": [],
-      "id": User['id'],
-      "name": User['name'],
-      "email": User['email'],
-      "branch": null,
-      "college": null,
-      "oAuthProvider": User['oAuthProvider'],
-      "photoUrl": User['photoUrl'],
-      "year": null,
-      "updated_at": User['updated_at'],
-      "created_at": User['created_at'],
-    };
-    this.User = USER.fromJson(data);
+    // Map<String, dynamic> data = {
+    //   "emails": [],
+    //   "notifications": [],
+    //   "id": User['id'],
+    //   "name": User['name'],
+    //   "email": User['email'],
+    //   "branch": null,
+    //   "college": null,
+    //   "oAuthProvider": User['oAuthProvider'],
+    //   "photoUrl": User['photoUrl'],
+    //   "year": null,
+    //   "updated_at": User['updated_at'],
+    //   "created_at": User['created_at'],
+    // };
+    this.User = null;
   }
 
   factory NOTIFICATIONS.fromJson(Map<String, Object?> json) {
@@ -43,7 +43,7 @@ class NOTIFICATIONS {
       title: json['title'] as String,
       body: json['body'] as String,
       scheduledTime: DateTime.parse(json['scheduledTime'].toString()),
-      User: json['User'],
+      User: null,
     );
   }
 }
