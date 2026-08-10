@@ -16,7 +16,6 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   intilaizeMsg();
   if (msg != null) {
-    log("running");
     msg!.getNotificationSettings().then((val) {
       log(val.authorizationStatus.toString());
       if (val.authorizationStatus == AuthorizationStatus.notDetermined) {
@@ -36,6 +35,7 @@ void main() async {
       }
     });
   }
+  getToken();
   runApp(ProviderScope(child: MyApp()));
   await initApi();
   await initGoogle();
