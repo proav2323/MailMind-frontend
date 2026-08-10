@@ -5,6 +5,11 @@ plugins {
     // END: FlutterFire Configuration
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+    // Official Google Services dependency reference
+    id("com.google.gms.google-services") version "4.5.0" apply false
+    id("com.android.application")
+    // Apply the Google Services plugin
+    id("com.google.gms.google-services")
 }
 
 android {
