@@ -29,13 +29,17 @@ void main() async {
               provisional: false,
               sound: true,
             )
-            .then((value) => {log("not asked")});
+            .then((value) {
+              log("not asked");
+              getToken();
+            });
       } else if (val.authorizationStatus == AuthorizationStatus.denied) {
+        getToken();
         log("denied");
       }
+      getToken();
     });
   }
-  getToken();
   runApp(ProviderScope(child: MyApp()));
   await initApi();
   await initGoogle();
