@@ -16,6 +16,13 @@ Future<void> initFirebaseApp() async {
 
 void intilaizeMsg() {
   msg = FirebaseMessaging.instance;
+  if (msg != null) {
+    msg!.getToken().then(
+      (value) => {
+        if (value != null) {log(value)},
+      },
+    );
+  }
   log("intaizing msg");
 }
 
