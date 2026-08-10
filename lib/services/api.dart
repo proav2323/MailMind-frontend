@@ -139,6 +139,7 @@ Future<void> logout() async {
     await initApi();
   }
   await _dio.put("");
+  await removeFid();
   await clearAllCookies();
 }
 
@@ -148,10 +149,24 @@ Future<void> saveFid() async {
   }
   String? fid = await getFirebaseInstallationId();
   if (fid == null) {
-    log("fid is hull");
+    log("fid is null");
   } else {
     _dio.options.headers['fid'] = fid;
     _dio.options.headers['platform'] = kIsWeb ? "web" : "mobile";
     await _dio.get('/auth/save');
+  }
+}
+
+Future<void> removeFid() async {
+  if (_cookieJar == null) {
+    await initApi();
+  }
+  String? fid = await getFirebaseInstallationId();
+  if (fid == null) {
+    log("fid is null");
+  } else {
+    _dio.options.headers['fid'] = fid;
+    _dio.options.headers['platform'] = kIsWeb ? "web" : "mobile";
+    await _dio.get('/auth/remove');
   }
 }
