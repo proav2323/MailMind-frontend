@@ -125,8 +125,8 @@ Future<Response<dynamic>> getNewEmails() async {
   if (_cookieJar == null) {
     await initApi();
   }
-  // wakeAiService();
   await saveFid();
+  // wakeAiService();
   _dio.options.headers['Content-Type'] = 'application/json';
   String? year = await getItem("year") as String?;
   _dio.options.headers['year'] = year;

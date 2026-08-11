@@ -16,29 +16,16 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   intilaizeMsg();
   if (msg != null) {
-    msg!.getNotificationSettings().then((val) {
-      log(val.authorizationStatus.toString());
-      if (val.authorizationStatus == AuthorizationStatus.notDetermined) {
-        msg!
-            .requestPermission(
-              alert: true,
-              announcement: false,
-              badge: true,
-              carPlay: false,
-              criticalAlert: false,
-              provisional: false,
-              sound: true,
-            )
-            .then((value) {
-              log("not asked");
-              getToken();
-            });
-      } else if (val.authorizationStatus == AuthorizationStatus.denied) {
-        getToken();
-        log("denied");
-      }
-      getToken();
-    });
+    await msg!.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+    getToken();
   }
   runApp(ProviderScope(child: MyApp()));
   await initApi();
