@@ -100,10 +100,10 @@ class FirebaseSetup {
       print('Notification clicked while app was in background state!');
       // Route parsing logic can go here
     });
-      msg.onTokenRefresh.listen((newToken) async {
-        log(newToken);
-        await saveFid();
-      });
+    msg.onTokenRefresh.listen((newToken) async {
+      log(newToken);
+      await saveFid();
+    });
     // 7. Extract the device token for testing payloads
     getToken();
   }
