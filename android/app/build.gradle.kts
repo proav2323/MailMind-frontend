@@ -48,7 +48,7 @@ flutter {
     source = "../.."
 }
 
+// 2. THIS BLOCK MUST BE PRESENT TO RESOLVE THE ERROR
 dependencies {
-    // THIS LINE WAS MISSING OR PLACED INCORRECTLY:
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 }

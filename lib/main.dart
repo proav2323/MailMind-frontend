@@ -6,25 +6,15 @@ import 'package:mailmind/services/auth.dart';
 import 'package:mailmind/services/firebase.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'dart:developer';
-
-@pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {}
+import 'package:firebase_core/firebase_core.dart';
+import '../firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initFirebaseApp();
-  await msg.requestPermission(
-    alert: true,
-    announcement: false,
-    badge: true,
-    carPlay: false,
-    criticalAlert: false,
-    provisional: false,
-    sound: true,
-  );
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  FirebaseSetup FS = new FirebaseSetup();
+  await FS.init();
   runApp(ProviderScope(child: MyApp()));
-  await listenMsg();
   await initApi();
   await initGoogle();
 }

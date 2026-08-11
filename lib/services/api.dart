@@ -147,7 +147,7 @@ Future<void> saveFid() async {
   if (_cookieJar == null) {
     await initApi();
   }
-  String? fid = await getFirebaseInstallationId();
+  String? fid = await FirebaseSetup.getFirebaseInstallationId();
   if (fid == null) {
     log("fid is null");
   } else {
@@ -161,7 +161,7 @@ Future<void> removeFid() async {
   if (_cookieJar == null) {
     await initApi();
   }
-  String? fid = await getFirebaseInstallationId();
+  String? fid = await FirebaseSetup.getFirebaseInstallationId();
   if (fid == null) {
     log("fid is null");
   } else {

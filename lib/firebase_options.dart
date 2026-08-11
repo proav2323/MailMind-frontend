@@ -41,49 +41,51 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCwjIrvFokuxRJG9ebjTk7jBNFd1H6-ehA',
-    appId: '1:1019970178825:web:50e091065ec1954c5b0dd8',
-    messagingSenderId: '1019970178825',
-    projectId: 'mailmind-4ca8e',
-    authDomain: 'mailmind-4ca8e.firebaseapp.com',
-    storageBucket: 'mailmind-4ca8e.firebasestorage.app',
-    measurementId: 'G-DCYXRK3J8K',
+    apiKey: 'AIzaSyB8U7EL3F0-ihhxVsCGm6sUm0iWEWjZyTQ',
+    appId: '1:954214301039:web:49af42e5d81c15f5ecbc9a',
+    messagingSenderId: '954214301039',
+    projectId: 'massive-vector-501914-a5',
+    authDomain: 'massive-vector-501914-a5.firebaseapp.com',
+    storageBucket: 'massive-vector-501914-a5.firebasestorage.app',
+    measurementId: 'G-KX6679E6EX',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyDUhilpLISTUCObAkg68ZyZcKd46PzZ0qc',
-    appId: '1:1019970178825:ios:368def3ca95528935b0dd8',
-    messagingSenderId: '1019970178825',
-    projectId: 'mailmind-4ca8e',
-    storageBucket: 'mailmind-4ca8e.firebasestorage.app',
-    iosClientId: '1019970178825-5bh5b4a405agjcmsld8iookldbhpmo7b.apps.googleusercontent.com',
+    apiKey: 'AIzaSyA6wdeQ_AsPOhQN5pKtBjOtMqcr8bMWQEg',
+    appId: '1:954214301039:ios:3a2772813670a021ecbc9a',
+    messagingSenderId: '954214301039',
+    projectId: 'massive-vector-501914-a5',
+    storageBucket: 'massive-vector-501914-a5.firebasestorage.app',
+    androidClientId: '954214301039-qvgpgp6ttgj3uus1p8kugfaa8gamfprb.apps.googleusercontent.com',
+    iosClientId: '954214301039-t7tvo7h1denqb7mdhg832etpsaop9ni5.apps.googleusercontent.com',
     iosBundleId: 'com.example.mailmindFrontend',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyCwjIrvFokuxRJG9ebjTk7jBNFd1H6-ehA',
-    appId: '1:1019970178825:web:50e091065ec1954c5b0dd8',
-    messagingSenderId: '1019970178825',
-    projectId: 'mailmind-4ca8e',
-    authDomain: 'mailmind-4ca8e.firebaseapp.com',
-    storageBucket: 'mailmind-4ca8e.firebasestorage.app',
-    measurementId: 'G-DCYXRK3J8K',
+    apiKey: 'AIzaSyB8U7EL3F0-ihhxVsCGm6sUm0iWEWjZyTQ',
+    appId: '1:954214301039:web:26fed76766e661b6ecbc9a',
+    messagingSenderId: '954214301039',
+    projectId: 'massive-vector-501914-a5',
+    authDomain: 'massive-vector-501914-a5.firebaseapp.com',
+    storageBucket: 'massive-vector-501914-a5.firebasestorage.app',
+    measurementId: 'G-8LYRVPLC1P',
   );
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDUhilpLISTUCObAkg68ZyZcKd46PzZ0qc',
-    appId: '1:1019970178825:ios:368def3ca95528935b0dd8',
-    messagingSenderId: '1019970178825',
-    projectId: 'mailmind-4ca8e',
-    storageBucket: 'mailmind-4ca8e.firebasestorage.app',
-    iosClientId: '1019970178825-5bh5b4a405agjcmsld8iookldbhpmo7b.apps.googleusercontent.com',
+    apiKey: 'AIzaSyA6wdeQ_AsPOhQN5pKtBjOtMqcr8bMWQEg',
+    appId: '1:954214301039:ios:3a2772813670a021ecbc9a',
+    messagingSenderId: '954214301039',
+    projectId: 'massive-vector-501914-a5',
+    storageBucket: 'massive-vector-501914-a5.firebasestorage.app',
+    androidClientId: '954214301039-qvgpgp6ttgj3uus1p8kugfaa8gamfprb.apps.googleusercontent.com',
+    iosClientId: '954214301039-t7tvo7h1denqb7mdhg832etpsaop9ni5.apps.googleusercontent.com',
     iosBundleId: 'com.example.mailmindFrontend',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyChMcS6KMmYVDVB71sSIKhooqyHbc4fgYo',
-    appId: '1:1019970178825:android:157bfb38f72ddfff5b0dd8',
-    messagingSenderId: '1019970178825',
-    projectId: 'mailmind-4ca8e',
-    storageBucket: 'mailmind-4ca8e.firebasestorage.app',
+    apiKey: 'AIzaSyC1nEx_mzUJ8W7ohIMves0i22roSvPTlnQ',
+    appId: '1:954214301039:android:5bf90157e3307342ecbc9a',
+    messagingSenderId: '954214301039',
+    projectId: 'massive-vector-501914-a5',
+    storageBucket: 'massive-vector-501914-a5.firebasestorage.app',
   );
 }
