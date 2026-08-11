@@ -13,6 +13,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FirebaseSetup FS = new FirebaseSetup();
+  FS.app = Firebase.apps[0];
   await FS.init();
   runApp(ProviderScope(child: MyApp()));
   await initApi();

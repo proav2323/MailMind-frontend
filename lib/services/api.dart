@@ -5,10 +5,8 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mailmind/models/user.dart';
 import 'package:mailmind/services/firebase.dart';
-import 'package:mailmind/services/socket.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:mailmind/services/sharedPref.dart';
 import 'package:http/http.dart' as http;
@@ -103,7 +101,7 @@ Future<void> setCustomCookie(
         ..path = "/"
         ..httpOnly = false,
     ];
-    await _cookieJar!.saveFromResponse(url, cookies);
+    _cookieJar!.saveFromResponse(url, cookies);
   }
 }
 
@@ -147,12 +145,16 @@ Future<void> saveFid() async {
   if (_cookieJar == null) {
     await initApi();
   }
-  String? fid = await FirebaseSetup.getFirebaseInstallationId();
-  if (fid == null) {
-    log("fid is null");
+  FirebaseSetup FS = new FirebaseSetup();
+  String? fid = await FS.getFirebaseInstallationId();
+  String? token = await FS.getToken();
+  if (fid == null || token == null) {
+    log(fid ?? "fid is null");
+    log(token ?? "token null");
   } else {
     _dio.options.headers['fid'] = fid;
     _dio.options.headers['platform'] = kIsWeb ? "web" : "mobile";
+    _dio.options.headers['token'] = token;
     await _dio.get('/auth/save');
   }
 }
@@ -161,12 +163,17 @@ Future<void> removeFid() async {
   if (_cookieJar == null) {
     await initApi();
   }
-  String? fid = await FirebaseSetup.getFirebaseInstallationId();
-  if (fid == null) {
-    log("fid is null");
+  FirebaseSetup FS = new FirebaseSetup();
+  String? fid = await FS.getFirebaseInstallationId();
+  String? token = await FS.getToken();
+  if (fid == null || token == null) {
+    log(fid ?? "fid null");
+    log(token ?? "token null");
+    log("fid is null or token is null");
   } else {
     _dio.options.headers['fid'] = fid;
     _dio.options.headers['platform'] = kIsWeb ? "web" : "mobile";
+    _dio.options.headers['token'] = token;
     await _dio.get('/auth/remove');
   }
 }

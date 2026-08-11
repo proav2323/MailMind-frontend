@@ -1,7 +1,9 @@
 import 'dart:developer';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_app_installations/firebase_app_installations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:mailmind/services/api.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -10,6 +12,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 class FirebaseSetup {
   static final FirebaseMessaging msg = FirebaseMessaging.instance;
+  FirebaseApp? app = Firebase.apps.isNotEmpty ? Firebase.apps[0] : null;
   static final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
 
@@ -23,31 +26,32 @@ class FirebaseSetup {
       provisional: false,
       sound: true,
     );
+
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     await listenMsg();
   }
 
-  void getToken() {
+  Future<String?> getToken() async {
     try {
-    msg.getToken().then((value) {
-      if (value != null) {
-        log(value);
-      }
-    });
-    msg.getAPNSToken().then((value) {
-      if (value != null) {
-        log(value);
-      }
-    });
+      await msg.getAPNSToken();
+      String? token = await msg.getToken();
+      return token;
     } catch (e) {
       print(e);
+      return null;
     }
   }
 
-  static Future<String?> getFirebaseInstallationId() async {
+  Future<String?> getFirebaseInstallationId() async {
+    log(app.toString());
     try {
-      String fid = await FirebaseInstallations.instance.getId();
-      return fid;
+      if (app != null) {
+        // String fid = await FirebaseInstallations.instanceFor(app: app!).getId();
+        String fid = await FirebaseInstallations.instance.getId();
+        return fid;
+      } else {
+        return null;
+      }
     } catch (e) {
       log("Error fetching FID: $e");
       return null;
@@ -96,7 +100,10 @@ class FirebaseSetup {
       print('Notification clicked while app was in background state!');
       // Route parsing logic can go here
     });
-
+      msg.onTokenRefresh.listen((newToken) async {
+        log(newToken);
+        await saveFid();
+      });
     // 7. Extract the device token for testing payloads
     getToken();
   }
