@@ -16,17 +16,21 @@ Future<void> initFirebaseApp() async {
 
 void intilaizeMsg() {
   msg = FirebaseMessaging.instance;
-
   log("intaizing msg");
 }
 
 void getToken() {
   if (msg != null) {
-    msg!.getToken().then(
-      (value) => {
-        if (value != null) {log(value)},
-      },
-    );
+    msg!.getToken().then((value) {
+      if (value != null) {
+        log(value);
+      }
+    });
+    msg!.getAPNSToken().then((value) {
+      if (value != null) {
+        log(value);
+      }
+    });
   }
 }
 
