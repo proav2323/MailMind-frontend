@@ -23,23 +23,12 @@ class _SocketLifecycleManagerState extends State<SocketLifecycleManager> {
   void initState() {
     super.initState();
     getSocket();
-    listenMsg();
 
     _lifecycleListener = AppLifecycleListener(
       onHide: () => _disconnectSocket(),
       onDetach: () => _disconnectSocket(),
       onInactive: () => _disconnectSocket(),
     );
-  }
-
-  void listenMsg() {
-    FirebaseMessaging.onMessage.listen((payload) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(payload.notification!.title ?? "you have anew email"),
-        ),
-      );
-    });
   }
 
   void _disconnectSocket() {

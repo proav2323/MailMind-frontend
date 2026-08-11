@@ -13,21 +13,18 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {}
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initFirebaseApp();
+  await msg.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  intilaizeMsg();
-  if (msg != null) {
-    await msg!.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
-    );
-    getToken();
-  }
   runApp(ProviderScope(child: MyApp()));
+  await listenMsg();
   await initApi();
   await initGoogle();
 }
