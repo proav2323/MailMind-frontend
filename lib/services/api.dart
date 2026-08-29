@@ -184,7 +184,11 @@ Future<Map<String, Object?>> getUserEmailsApi() async {
   if (_cookieJar == null) {
     await initApi();
   }
-  _dio.options.headers['Content-Type'] = 'application/json';
-  final res = await _dio.get('/emails/user');
-  return res.data;
+  try {
+    final res = await _dio.get('/emails/user');
+    return res.data;
+  } catch (e) {
+    log(e.toString());
+    return {};
+  }
 }

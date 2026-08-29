@@ -1,10 +1,12 @@
 import 'dart:developer';
+import 'package:mailmind/components/BottomNavigationBar.dart';
 import 'package:mailmind/components/Drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mailmind/components/UserAppBar.dart';
 import 'package:mailmind/models/email.dart';
 import 'package:mailmind/models/user.dart';
+import 'package:mailmind/pages/inbox.dart';
 import 'package:mailmind/services/auth.dart';
 import 'package:mailmind/services/emails.dart';
 import 'package:mailmind/services/sharedPref.dart';
@@ -16,8 +18,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class MyHomePage extends StatefulWidget {
   USER? user;
   bool isLaoding = true;
-  String? cursor;
-  bool hasMore = false;
+  int index = 0;
   MyHomePage({super.key});
 
   @override
@@ -25,6 +26,15 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  void change(int newIndex) {
+    if (newIndex == 2) {
+    } else {
+      setState(() {
+        widget.index = newIndex;
+      });
+    }
+  }
+
   void init() {
     final container = ProviderContainer();
     container.listen(
@@ -68,13 +78,9 @@ class _MyHomePageState extends State<MyHomePage> {
               }
               USER user = await auth(true, null);
               userProvider.overrideWithValue(AsyncValue.data(user));
-              cursorData data = await getUserEmails();
-              overrideValue(false, data.emails, []);
               setState(() {
                 widget.user = user;
                 widget.isLaoding = false;
-                widget.cursor = data.cursor;
-                widget.hasMore = data.hasMore;
               });
             }
           },
@@ -119,7 +125,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
           socket.socket.on('disconnect', (_) {});
         });
-        AsyncValue<List<EMAILS>> emailsService = ref.watch(emailsProivder);
         return SafeArea(
           child: Scaffold(
             appBar: widget.user == null
@@ -151,35 +156,79 @@ class _MyHomePageState extends State<MyHomePage> {
                     user: widget.user!,
                   )
                 : null,
+            bottomNavigationBar: widget.user != null
+                ? CustomBottomNavigationBar(
+                    actions: [
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.home),
+                        label: "Home",
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.mail),
+                        label: "Inbox",
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.red, // Custom background color
+                            borderRadius: BorderRadius.circular(
+                              200,
+                            ), // Rounded border
+                          ),
+                          child: const Icon(Icons.add, color: Colors.white),
+                        ),
+                        label: '', // Required empty label to hide text space
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.calendar_view_day_rounded),
+                        label: "Calender",
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.phone),
+                        label: "Reminders",
+                      ),
+                    ],
+                    user: widget.user!,
+                    index: widget.index,
+                    change: change,
+                  )
+                : null,
             body: widget.isLaoding == true
                 ? Center(child: CircularProgressIndicator())
                 : widget.user != null
-                ? Center(
-                    child: SizedBox(
-                      width: screenWidth * 0.90,
-                      child: ListView(
-                        children: [
-                          SizedBox(height: 20),
-                          Text(
-                            "Hello, ${widget.user!.name} 👋",
-                            style: TextStyle(
-                              fontSize: 25,
-                              fontStyle: FontStyle.normal,
-                              fontWeight: FontWeight.bold,
+                ? widget.index == 0
+                      ? Center(
+                          child: SizedBox(
+                            width: screenWidth * 0.90,
+                            child: ListView(
+                              children: [
+                                SizedBox(height: 20),
+                                Text(
+                                  "Hello, ${widget.user!.name} 👋",
+                                  style: TextStyle(
+                                    fontSize: 25,
+                                    fontStyle: FontStyle.normal,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  "Here's what's important today",
+                                  style: TextStyle(
+                                    color: isDarkMode
+                                        ? Colors.blueGrey
+                                        : Colors.white70,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          Text(
-                            "Here's what's important today",
-                            style: TextStyle(
-                              color: isDarkMode
-                                  ? Colors.blueGrey
-                                  : Colors.white70,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
+                        )
+                      : widget.index == 1
+                      ? Inbox()
+                      : widget.index == 3
+                      ? Text("calenders")
+                      : Text("reminders")
                 : Text("something went wrong"),
           ),
         );

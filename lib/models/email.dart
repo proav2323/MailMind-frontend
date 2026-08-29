@@ -39,7 +39,7 @@ class EMAILS {
       priority: json['priority'] as String,
       subject: json['subject'] as String,
       aiPriority: json['aiPriority'] as String,
-      isStarred: json['isStarred'] as bool,
+      isStarred: json['isStared'] as bool,
     );
   }
 }

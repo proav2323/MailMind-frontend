@@ -1,32 +1,74 @@
+import 'dart:developer';
+
 import 'package:mailmind/models/email.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mailmind/models/emails.dart';
 import 'package:mailmind/services/api.dart';
 
-final emailsProivder = FutureProvider<List<EMAILS>>((ref) async {
-  return [];
-}, retry: (retryCount, error) {});
+final emailsProivder = NotifierProvider(emailsNotifier.new);
 
 final emailProivder = FutureProvider<EMAIL?>((ref) async {
   return null;
 }, retry: (retryCount, error) {});
+
+final cursorProvider = NotifierProvider(cursorNotifier.new);
+
+final hasMoreProvider = NotifierProvider(hasMoreNotifier.new);
 
 Future<cursorData> getUserEmails() async {
   Map<String, Object?> data = await getUserEmailsApi();
   return cursorData.formJson(data);
 }
 
-void overrideValue(bool add, List<EMAILS> newData, List<EMAILS>? oldData) {
-  if (add == true && oldData != null) {
-    List<EMAILS> emails = oldData;
-    newData.forEach((email) {
-      emails.add(email);
-    });
+class emailsNotifier extends Notifier<List<EMAILS>> {
+  @override
+  List<EMAILS> build() => []; // Initial value
 
-    emailsProivder.overrideWithValue(AsyncValue.data(emails));
-  } else {
-    emailsProivder.overrideWithValue(AsyncValue.data(newData));
+  // Method to change value after it initializes
+
+  void updateValue(bool add, List<EMAILS> newData) {
+    if (add == true) {
+      List<EMAILS> emails = state;
+      newData.forEach((email) {
+        emails.add(email);
+      });
+      state = emails;
+    } else {
+      state = newData;
+    }
+  }
+
+  List<EMAILS> getValue() {
+    return state;
+  }
+}
+
+class hasMoreNotifier extends Notifier<bool> {
+  @override
+  bool build() => false; // Initial value
+
+  // Method to change value after it initializes
+  void updateValue(bool newValue) {
+    state = newValue;
+  }
+
+  bool getValue() {
+    return state;
+  }
+}
+
+class cursorNotifier extends Notifier<String?> {
+  @override
+  String? build() => null; // Initial value
+
+  // Method to change value after it initializes
+  void updateValue(String? newValue) {
+    state = newValue;
+  }
+
+  String? getValue() {
+    return state;
   }
 }
 
@@ -38,7 +80,7 @@ class cursorData {
   cursorData({
     required this.cursor,
     required this.hasMore,
-    required List<Map<String, Object?>> emails,
+    required List<dynamic> emails,
   }) {
     emails.forEach((email) {
       EMAILS newEmail = EMAILS.fromJson(email);
@@ -47,10 +89,11 @@ class cursorData {
   }
 
   factory cursorData.formJson(Map<String, Object?> json) {
+    log(json['hasMore'].toString());
     return cursorData(
-      cursor: json['cursor'] as String,
-      hasMore: json['hasMore'] as bool,
-      emails: json['emails'] as List<Map<String, Object?>>,
+      cursor: json['nextCursor'] as String,
+      hasMore: bool.parse(json['hasMore'].toString()),
+      emails: json['emails'] as List<dynamic>,
     );
   }
 }
