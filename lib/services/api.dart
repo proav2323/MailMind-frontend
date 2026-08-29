@@ -5,7 +5,9 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
+import 'package:mailmind/models/email.dart';
 import 'package:mailmind/models/user.dart';
+import 'package:mailmind/services/emails.dart';
 import 'package:mailmind/services/firebase.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:mailmind/services/sharedPref.dart';
@@ -176,4 +178,13 @@ Future<void> removeFid() async {
     _dio.options.headers['token'] = token;
     await _dio.get('/auth/remove');
   }
+}
+
+Future<Map<String, Object?>> getUserEmailsApi() async {
+  if (_cookieJar == null) {
+    await initApi();
+  }
+  _dio.options.headers['Content-Type'] = 'application/json';
+  final res = await _dio.get('/emails/user');
+  return res.data;
 }

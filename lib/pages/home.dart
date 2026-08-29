@@ -3,8 +3,10 @@ import 'package:mailmind/components/Drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mailmind/components/UserAppBar.dart';
+import 'package:mailmind/models/email.dart';
 import 'package:mailmind/models/user.dart';
 import 'package:mailmind/services/auth.dart';
+import 'package:mailmind/services/emails.dart';
 import 'package:mailmind/services/sharedPref.dart';
 import 'package:mailmind/services/api.dart';
 import 'package:dio/dio.dart';
@@ -14,6 +16,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class MyHomePage extends StatefulWidget {
   USER? user;
   bool isLaoding = true;
+  String? cursor;
+  bool hasMore = false;
   MyHomePage({super.key});
 
   @override
@@ -64,9 +68,13 @@ class _MyHomePageState extends State<MyHomePage> {
               }
               USER user = await auth(true, null);
               userProvider.overrideWithValue(AsyncValue.data(user));
+              cursorData data = await getUserEmails();
+              overrideValue(false, data.emails, []);
               setState(() {
                 widget.user = user;
                 widget.isLaoding = false;
+                widget.cursor = data.cursor;
+                widget.hasMore = data.hasMore;
               });
             }
           },
@@ -111,6 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
           socket.socket.on('disconnect', (_) {});
         });
+        AsyncValue<List<EMAILS>> emailsService = ref.watch(emailsProivder);
         return SafeArea(
           child: Scaffold(
             appBar: widget.user == null
