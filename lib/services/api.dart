@@ -192,3 +192,16 @@ Future<Map<String, Object?>> getUserEmailsApi() async {
     return {};
   }
 }
+
+Future<Map<String, Object?>> getUserCategories() async {
+  if (_cookieJar == null) {
+    await initApi();
+  }
+  try {
+    final res = await _dio.get('/categories/user');
+    return res.data;
+  } catch (e) {
+    log(e.toString());
+    return {};
+  }
+}

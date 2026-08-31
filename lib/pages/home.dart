@@ -19,7 +19,20 @@ class MyHomePage extends StatefulWidget {
   USER? user;
   bool isLaoding = true;
   int index = 0;
-  MyHomePage({super.key});
+  String? category;
+  String? priority;
+  String? starred;
+  String? dateStart;
+  String? dateEnd;
+  MyHomePage({
+    super.key,
+    required this.index,
+    required this.category,
+    required this.dateEnd,
+    required this.dateStart,
+    required this.priority,
+    required this.starred,
+  });
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -29,6 +42,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void change(int newIndex) {
     if (newIndex == 2) {
     } else {
+      context.go("/inbox");
       setState(() {
         widget.index = newIndex;
       });
@@ -225,7 +239,13 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                         )
                       : widget.index == 1
-                      ? Inbox()
+                      ? Inbox(
+                          category: widget.category,
+                          dateEnd: widget.dateEnd,
+                          dateStart: widget.dateStart,
+                          priority: widget.priority,
+                          starred: widget.starred,
+                        )
                       : widget.index == 3
                       ? Text("calenders")
                       : Text("reminders")

@@ -1,23 +1,27 @@
 import 'dart:developer';
-import 'package:flutter_riverpod/misc.dart';
-import 'package:mailmind/components/Drawer.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:mailmind/components/UserAppBar.dart';
-import 'package:mailmind/models/email.dart';
-import 'package:mailmind/models/user.dart';
-import 'package:mailmind/services/auth.dart';
-import 'package:mailmind/services/emails.dart';
-import 'package:mailmind/services/sharedPref.dart';
 import 'package:mailmind/services/api.dart';
-import 'package:dio/dio.dart';
+import 'package:mailmind/services/emails.dart';
 import 'package:mailmind/services/socket.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 // 1. Change from StatefulWidget to ConsumerStatefulWidget
 class Inbox extends ConsumerStatefulWidget {
-  const Inbox({super.key});
+  String? category;
+  String? priority;
+  String? starred;
+  String? dateStart;
+  String? dateEnd;
+  Inbox({
+    super.key,
+    required this.category,
+    required this.dateEnd,
+    required this.dateStart,
+    required this.priority,
+    required this.starred,
+  });
 
   @override
   ConsumerState<Inbox> createState() => _InboxState();
@@ -28,8 +32,16 @@ class _InboxState extends ConsumerState<Inbox> {
   bool isLoading = true; // Use simple state for UI loading spinner only
 
   void init() async {
+    cursorData data;
     try {
-      cursorData data = await getUserEmails();
+      if (widget.category != null ||
+          widget.priority != null ||
+          widget.starred != null ||
+          (widget.dateEnd != null && widget.dateStart != null)) {
+        data = await getUserEmails();
+      } else {
+        data = await getUserEmails();
+      }
 
       // 3. Update Riverpod providers directly when data arrives using ref.read
       ref.read(emailsProivder.notifier).updateValue(false, data.emails);
@@ -64,8 +76,66 @@ class _InboxState extends ConsumerState<Inbox> {
     double screenWidth = MediaQuery.of(context).size.width;
     final emails = ref.watch(emailsProivder);
 
+    final List<Map<String, dynamic>> categories = [
+      {"name": "assignment"},
+      {"name": "project"},
+      {"name": "syllabus"},
+      {"name": "task"},
+      {"name": "meeting"},
+      {"name": "review"},
+      {"name": "interview"},
+      {"name": "course"},
+      {"name": "exam"},
+      {"name": "submission"},
+      {"name": "invoice"},
+      {"name": "report"},
+      {"name": "schedule"},
+      {"name": "urgent"},
+      {"name": "education"},
+      {"name": "work"},
+      {"name": "school"},
+      {"name": "office"},
+      {"name": "OTP"},
+      {"name": "event"},
+      {"name": "hackathons"},
+      {"name": "class"},
+      {"name": "annoucements"},
+      {"name": "finace"},
+      {"name": "billing"},
+      {"name": "placement"},
+      {"name": "reminder"},
+      {"name": "fees"},
+      {"name": "scholarship"},
+      {"name": "timetable"},
+      {"name": "academic"},
+      {"name": "holiday"},
+      {"name": "club"},
+      {"name": "intership"},
+      {"name": "research"},
+      {"name": "Finace"},
+      {"name": "personal"},
+      {"name": "spam"},
+      {"name": "social"},
+    ];
+
+    getUserCategories()
+        .then((value) {
+          categories.insert(0, {"name": value['name']});
+        })
+        .onError((err, trace) {
+          log(err.toString());
+          log(trace.toString());
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: kReleaseMode
+                  ? Text("something went wrong")
+                  : Text(err.toString()),
+            ),
+          );
+        });
+
     return SafeArea(
-      child: isLoading
+      child: isLoading && emails.isEmpty == true
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
@@ -240,6 +310,11 @@ class _InboxState extends ConsumerState<Inbox> {
                     },
                   ),
                 ),
+                isLoading == true ? SizedBox(height: 10) : SizedBox(height: 0),
+                isLoading == true
+                    ? Center(child: CircularProgressIndicator())
+                    : SizedBox(height: 0),
+                isLoading == true ? SizedBox(height: 5) : SizedBox(height: 0),
               ],
             ),
     );

@@ -111,7 +111,36 @@ class _SocketLifecycleManagerState extends State<SocketLifecycleManager> {
 final _router = GoRouter(
   initialLocation: '/',
   routes: [
-    GoRoute(path: '/', builder: (context, state) => MyHomePage()),
+    GoRoute(
+      path: '/',
+      builder: (context, state) => MyHomePage(
+        index: 0,
+        category: null,
+        dateEnd: null,
+        dateStart: null,
+        priority: null,
+        starred: null,
+      ),
+    ),
+    GoRoute(
+      path: '/inbox',
+      builder: (context, state) {
+        final category = state.uri.queryParameters['category'];
+        final priority = state.uri.queryParameters['sort'];
+        final starred = state.uri.queryParameters['starred'];
+        final dateStart = state.uri.queryParameters['dateStart'];
+        final dateEnd = state.uri.queryParameters['dateEnd'];
+
+        return MyHomePage(
+          index: 1,
+          category: category,
+          dateEnd: dateEnd,
+          dateStart: dateStart,
+          starred: starred,
+          priority: priority,
+        );
+      },
+    ),
     GoRoute(path: '/login', builder: (context, state) => LoginPage()),
     GoRoute(path: "/year", builder: (context, state) => yearSelect()),
   ],

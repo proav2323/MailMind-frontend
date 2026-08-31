@@ -110,3 +110,7 @@ Future<void> logoutUser(BuildContext context) async {
   userProvider.overrideWithValue(AsyncValue.data(null));
   context.go("/login");
 }
+
+Future<Map<String, Object?>> getUserCategories() {
+  return getUserCategories();
+}
