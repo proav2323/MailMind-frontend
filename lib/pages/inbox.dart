@@ -30,10 +30,73 @@ class Inbox extends ConsumerStatefulWidget {
 // 2. Change from State to ConsumerState
 class _InboxState extends ConsumerState<Inbox> {
   bool isLoading = true; // Use simple state for UI loading spinner only
+  List<Map<String, dynamic>> categories = [
+    {"name": "assignment"},
+    {"name": "project"},
+    {"name": "syllabus"},
+    {"name": "task"},
+    {"name": "meeting"},
+    {"name": "review"},
+    {"name": "interview"},
+    {"name": "course"},
+    {"name": "exam"},
+    {"name": "submission"},
+    {"name": "invoice"},
+    {"name": "report"},
+    {"name": "schedule"},
+    {"name": "urgent"},
+    {"name": "education"},
+    {"name": "work"},
+    {"name": "school"},
+    {"name": "office"},
+    {"name": "OTP"},
+    {"name": "event"},
+    {"name": "hackathons"},
+    {"name": "class"},
+    {"name": "annoucements"},
+    {"name": "finace"},
+    {"name": "billing"},
+    {"name": "placement"},
+    {"name": "reminder"},
+    {"name": "fees"},
+    {"name": "scholarship"},
+    {"name": "timetable"},
+    {"name": "academic"},
+    {"name": "holiday"},
+    {"name": "club"},
+    {"name": "intership"},
+    {"name": "research"},
+    {"name": "Finace"},
+    {"name": "personal"},
+    {"name": "spam"},
+    {"name": "social"},
+  ];
 
   void init() async {
     cursorData data;
     try {
+      getUserCategories()
+          .then((value) {
+            List<Map<String, dynamic>> newCat = [...categories];
+            value.forEach((valueW) {
+              newCat.insert(0, {"name": valueW['name']});
+            });
+
+            setState(() {
+              categories = newCat;
+            });
+          })
+          .onError((err, trace) {
+            log(err.toString());
+            log(trace.toString());
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: kReleaseMode
+                    ? Text("something went wrong")
+                    : Text(err.toString()),
+              ),
+            );
+          });
       if (widget.category != null ||
           widget.priority != null ||
           widget.starred != null ||
@@ -76,64 +139,6 @@ class _InboxState extends ConsumerState<Inbox> {
     double screenWidth = MediaQuery.of(context).size.width;
     final emails = ref.watch(emailsProivder);
 
-    final List<Map<String, dynamic>> categories = [
-      {"name": "assignment"},
-      {"name": "project"},
-      {"name": "syllabus"},
-      {"name": "task"},
-      {"name": "meeting"},
-      {"name": "review"},
-      {"name": "interview"},
-      {"name": "course"},
-      {"name": "exam"},
-      {"name": "submission"},
-      {"name": "invoice"},
-      {"name": "report"},
-      {"name": "schedule"},
-      {"name": "urgent"},
-      {"name": "education"},
-      {"name": "work"},
-      {"name": "school"},
-      {"name": "office"},
-      {"name": "OTP"},
-      {"name": "event"},
-      {"name": "hackathons"},
-      {"name": "class"},
-      {"name": "annoucements"},
-      {"name": "finace"},
-      {"name": "billing"},
-      {"name": "placement"},
-      {"name": "reminder"},
-      {"name": "fees"},
-      {"name": "scholarship"},
-      {"name": "timetable"},
-      {"name": "academic"},
-      {"name": "holiday"},
-      {"name": "club"},
-      {"name": "intership"},
-      {"name": "research"},
-      {"name": "Finace"},
-      {"name": "personal"},
-      {"name": "spam"},
-      {"name": "social"},
-    ];
-
-    getUserCategories()
-        .then((value) {
-          categories.insert(0, {"name": value['name']});
-        })
-        .onError((err, trace) {
-          log(err.toString());
-          log(trace.toString());
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: kReleaseMode
-                  ? Text("something went wrong")
-                  : Text(err.toString()),
-            ),
-          );
-        });
-
     return SafeArea(
       child: isLoading && emails.isEmpty == true
           ? const Center(child: CircularProgressIndicator())
@@ -141,7 +146,56 @@ class _InboxState extends ConsumerState<Inbox> {
               children: [
                 Container(
                   height: 50,
-                  child: Row(children: [Text(emails.length.toString())]),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 50,
+                        child: IconButton(
+                          onPressed: () {},
+                          icon: const Icon(Icons.add),
+                        ),
+                      ),
+                      SizedBox(width: 5),
+                      Expanded(
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) => Container(
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(200),
+                              ),
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: isDarkMode
+                                    ? [
+                                        const Color(0xFF1E1E24),
+                                        const Color(0xFF0F0F12),
+                                      ] // Dark Mode Colors
+                                    : [
+                                        const Color(0xFF667EEA),
+                                        const Color(0xFF764BA2),
+                                      ], // Light Mode Colors
+                              ),
+                            ),
+                            child: Text(categories[index]['name']),
+                          ),
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(height: 5),
+                          itemCount: categories.length,
+                        ),
+                      ),
+                      SizedBox(width: 5),
+                      SizedBox(
+                        width: 50,
+                        child: IconButton(
+                          onPressed: () {},
+                          icon: const Icon(Icons.filter_list),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 SizedBox(height: 10),
                 Expanded(

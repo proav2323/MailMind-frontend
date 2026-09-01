@@ -193,7 +193,7 @@ Future<Map<String, Object?>> getUserEmailsApi() async {
   }
 }
 
-Future<Map<String, Object?>> getUserCategories() async {
+Future<List<Map<String, Object?>>> getUserCategories() async {
   if (_cookieJar == null) {
     await initApi();
   }
@@ -202,6 +202,6 @@ Future<Map<String, Object?>> getUserCategories() async {
     return res.data;
   } catch (e) {
     log(e.toString());
-    return {};
+    return [];
   }
 }
