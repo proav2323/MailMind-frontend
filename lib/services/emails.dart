@@ -16,8 +16,27 @@ final cursorProvider = NotifierProvider(cursorNotifier.new);
 
 final hasMoreProvider = NotifierProvider(hasMoreNotifier.new);
 
-Future<cursorData> getUserEmails() async {
-  Map<String, Object?> data = await getUserEmailsApi();
+Future<cursorData> getUserEmails(String? cursor) async {
+  Map<String, Object?> data = await getUserEmailsApi(cursor);
+  return cursorData.formJson(data);
+}
+
+Future<cursorData> getUserFilteredEmails(
+  String? starred,
+  String? category,
+  String? priority,
+  String? dateStart,
+  String? dateEnd,
+  String? cursor,
+) async {
+  Map<String, Object?> data = await getUserFilteredEmailsApi(
+    starred,
+    category,
+    priority,
+    dateStart,
+    dateEnd,
+    cursor,
+  );
   return cursorData.formJson(data);
 }
 

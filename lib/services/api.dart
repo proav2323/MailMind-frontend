@@ -180,12 +180,44 @@ Future<void> removeFid() async {
   }
 }
 
-Future<Map<String, Object?>> getUserEmailsApi() async {
+Future<Map<String, Object?>> getUserEmailsApi(String? cursor) async {
   if (_cookieJar == null) {
     await initApi();
   }
   try {
-    final res = await _dio.get('/emails/user');
+    final res = await _dio.get(
+      '/emails/user',
+      queryParameters: {'cursor': cursor},
+    );
+    return res.data;
+  } catch (e) {
+    log(e.toString());
+    return {};
+  }
+}
+
+Future<Map<String, Object?>> getUserFilteredEmailsApi(
+  String? starred,
+  String? category,
+  String? priority,
+  String? dateStart,
+  String? dateEnd,
+  String? cursor,
+) async {
+  if (_cookieJar == null) {
+    await initApi();
+  }
+  try {
+    final res = await _dio.get(
+      '/emails/filter',
+      queryParameters: {
+        'starred': starred,
+        'category': category,
+        'priority': priority,
+        'dateStart': dateStart,
+        'dateEnd': dateEnd,
+      },
+    );
     return res.data;
   } catch (e) {
     log(e.toString());

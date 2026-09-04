@@ -30,6 +30,9 @@ class Inbox extends ConsumerStatefulWidget {
 // 2. Change from State to ConsumerState
 class _InboxState extends ConsumerState<Inbox> {
   bool isLoading = true; // Use simple state for UI loading spinner only
+
+  bool hasMore = true;
+
   List<Map<String, dynamic>> categories = [
     {"name": "assignment"},
     {"name": "project"},
@@ -101,9 +104,18 @@ class _InboxState extends ConsumerState<Inbox> {
           widget.priority != null ||
           widget.starred != null ||
           (widget.dateEnd != null && widget.dateStart != null)) {
-        data = await getUserEmails();
+        String? cursor = ref.read(cursorProvider.notifier).getValue();
+        data = await getUserFilteredEmails(
+          widget.starred,
+          widget.category,
+          widget.priority,
+          widget.dateStart,
+          widget.dateEnd,
+          cursor,
+        );
       } else {
-        data = await getUserEmails();
+        String? cursor = ref.read(cursorProvider.notifier).getValue();
+        data = await getUserEmails(cursor);
       }
 
       // 3. Update Riverpod providers directly when data arrives using ref.read
