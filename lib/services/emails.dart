@@ -50,7 +50,9 @@ class emailsNotifier extends Notifier<List<EMAILS>> {
     if (add == true) {
       List<EMAILS> emails = state;
       newData.forEach((email) {
-        emails.add(email);
+        if (!emails.any((e) => e.id == email.id)) {
+          emails.add(email);
+        }
       });
       state = emails;
     } else {
@@ -92,7 +94,7 @@ class cursorNotifier extends Notifier<String?> {
 }
 
 class cursorData {
-  String cursor;
+  String? cursor;
   bool hasMore;
   List<EMAILS> emails = [];
 

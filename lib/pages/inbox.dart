@@ -6,6 +6,7 @@ import 'package:mailmind/services/emails.dart';
 import 'package:mailmind/services/socket.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 // 1. Change from StatefulWidget to ConsumerStatefulWidget
 class Inbox extends ConsumerStatefulWidget {
@@ -119,7 +120,54 @@ class _InboxState extends ConsumerState<Inbox> {
       }
 
       // 3. Update Riverpod providers directly when data arrives using ref.read
-      ref.read(emailsProivder.notifier).updateValue(false, data.emails);
+      ref
+          .read(emailsProivder.notifier)
+          .updateValue(
+            ref.read(cursorProvider.notifier).getValue() != null ? true : false,
+            data.emails,
+          );
+      ref.read(cursorProvider.notifier).updateValue(data.cursor);
+      ref.read(hasMoreProvider.notifier).updateValue(data.hasMore);
+
+      setState(() {
+        isLoading = false;
+      });
+    } catch (e) {
+      log("Error fetching emails: $e");
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void getMoreEmails() async {
+    try {
+      cursorData data;
+      if (widget.category != null ||
+          widget.priority != null ||
+          widget.starred != null ||
+          (widget.dateEnd != null && widget.dateStart != null)) {
+        String? cursor = ref.read(cursorProvider.notifier).getValue();
+        data = await getUserFilteredEmails(
+          widget.starred,
+          widget.category,
+          widget.priority,
+          widget.dateStart,
+          widget.dateEnd,
+          cursor,
+        );
+      } else {
+        String? cursor = ref.read(cursorProvider.notifier).getValue();
+        data = await getUserEmails(cursor);
+      }
+
+      // 3. Update Riverpod providers directly when data arrives using ref.read
+      ref
+          .read(emailsProivder.notifier)
+          .updateValue(
+            ref.read(cursorProvider.notifier).getValue() != null ? true : false,
+            data.emails,
+          );
       ref.read(cursorProvider.notifier).updateValue(data.cursor);
       ref.read(hasMoreProvider.notifier).updateValue(data.hasMore);
 
@@ -269,107 +317,122 @@ class _InboxState extends ConsumerState<Inbox> {
                               ]; // Light Slate Gray
                       }
 
-                      return SizedBox(
-                        width: screenWidth,
-                        child: Card(
-                          child: Column(
-                            children: [
-                              SizedBox(height: 5),
-                              SizedBox(
-                                width: screenWidth * 0.97 * 0.95,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(200),
+                      return VisibilityDetector(
+                        key: Key('$index'),
+                        onVisibilityChanged: (info) {
+                          if (info.visibleFraction > 0.5 &&
+                              index == emails.length - 1 &&
+                              ref.read(hasMoreProvider.notifier).getValue() ==
+                                  true) {
+                            setState(() {
+                              isLoading = true;
+                            });
+                            getMoreEmails();
+                          }
+                        },
+                        child: SizedBox(
+                          width: screenWidth,
+                          child: Card(
+                            child: Column(
+                              children: [
+                                SizedBox(height: 5),
+                                SizedBox(
+                                  width: screenWidth * 0.97 * 0.95,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(200),
+                                          ),
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                            colors: isDarkMode
+                                                ? [
+                                                    const Color(0xFF1E1E24),
+                                                    const Color(0xFF0F0F12),
+                                                  ] // Dark Mode Colors
+                                                : [
+                                                    const Color(0xFF667EEA),
+                                                    const Color(0xFF764BA2),
+                                                  ], // Light Mode Colors
+                                          ),
                                         ),
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                          colors: isDarkMode
-                                              ? [
-                                                  const Color(0xFF1E1E24),
-                                                  const Color(0xFF0F0F12),
-                                                ] // Dark Mode Colors
-                                              : [
-                                                  const Color(0xFF667EEA),
-                                                  const Color(0xFF764BA2),
-                                                ], // Light Mode Colors
-                                        ),
+                                        child: Text(email.category),
                                       ),
-                                      child: Text(email.category),
-                                    ),
-                                    SizedBox(width: 2, height: 0),
-                                    Container(
-                                      padding: EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(200),
+                                      SizedBox(width: 2, height: 0),
+                                      Container(
+                                        padding: EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(200),
+                                          ),
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                            colors:
+                                                gradientColors, // Light Mode Colors
+                                          ),
                                         ),
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                          colors:
-                                              gradientColors, // Light Mode Colors
-                                        ),
+                                        child: Text(email.priority),
                                       ),
-                                      child: Text(email.priority),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(height: 4),
+                                SizedBox(
+                                  width: screenWidth * (0.97 * 0.95),
+                                  child: Text(
+                                    email.sender.split("<")[0],
+                                    style: TextStyle(
+                                      color: isDarkMode
+                                          ? Color(0xFF8C9ABA)
+                                          : Color.fromARGB(255, 197, 196, 196),
                                     ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(height: 4),
-                              SizedBox(
-                                width: screenWidth * (0.97 * 0.95),
-                                child: Text(
-                                  email.sender.split("<")[0],
-                                  style: TextStyle(
-                                    color: isDarkMode
-                                        ? Color(0xFF8C9ABA)
-                                        : Color.fromARGB(255, 197, 196, 196),
+                                    textAlign: TextAlign.start,
                                   ),
-                                  textAlign: TextAlign.start,
                                 ),
-                              ),
-                              SizedBox(
-                                width: screenWidth * (0.97 * 0.95),
-                                child: Text(
-                                  email.subject,
-                                  style: TextStyle(),
-                                  textAlign: TextAlign.start,
-                                ),
-                              ),
-                              SizedBox(
-                                width: screenWidth * (0.97 * 0.95),
-                                child: Text(
-                                  email.summary.length <= 80
-                                      ? email.summary
-                                      : email.summary.substring(0, 27) + "...",
-                                  style: TextStyle(
-                                    color: isDarkMode
-                                        ? Color(0xFF8C9ABA)
-                                        : Color.fromARGB(255, 197, 196, 196),
+                                SizedBox(
+                                  width: screenWidth * (0.97 * 0.95),
+                                  child: Text(
+                                    email.subject,
+                                    style: TextStyle(),
+                                    textAlign: TextAlign.start,
                                   ),
-                                  textAlign: TextAlign.start,
                                 ),
-                              ),
-                              SizedBox(
-                                width: screenWidth * (0.97 * 0.95),
-                                child: Text(
-                                  dateWithTime,
-                                  style: TextStyle(
-                                    color: isDarkMode
-                                        ? Color(0xFF8C9ABA)
-                                        : Color.fromARGB(255, 197, 196, 196),
+                                SizedBox(
+                                  width: screenWidth * (0.97 * 0.95),
+                                  child: Text(
+                                    email.summary.length <= 80
+                                        ? email.summary
+                                        : email.summary.substring(0, 27) +
+                                              "...",
+                                    style: TextStyle(
+                                      color: isDarkMode
+                                          ? Color(0xFF8C9ABA)
+                                          : Color.fromARGB(255, 197, 196, 196),
+                                    ),
+                                    textAlign: TextAlign.start,
                                   ),
-                                  textAlign: TextAlign.end,
                                 ),
-                              ),
-                              SizedBox(height: 5),
-                            ],
+                                SizedBox(
+                                  width: screenWidth * (0.97 * 0.95),
+                                  child: Text(
+                                    dateWithTime,
+                                    style: TextStyle(
+                                      color: isDarkMode
+                                          ? Color(0xFF8C9ABA)
+                                          : Color.fromARGB(255, 197, 196, 196),
+                                    ),
+                                    textAlign: TextAlign.end,
+                                  ),
+                                ),
+                                SizedBox(height: 5),
+                              ],
+                            ),
                           ),
                         ),
                       );
