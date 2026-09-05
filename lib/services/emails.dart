@@ -112,7 +112,7 @@ class cursorData {
   factory cursorData.formJson(Map<String, Object?> json) {
     log(json['hasMore'].toString());
     return cursorData(
-      cursor: json['nextCursor'] as String,
+      cursor: json['nextCursor'] as String?,
       hasMore: bool.parse(json['hasMore'].toString()),
       emails: json['emails'] as List<dynamic>,
     );

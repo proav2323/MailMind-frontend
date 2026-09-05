@@ -216,6 +216,7 @@ Future<Map<String, Object?>> getUserFilteredEmailsApi(
         'priority': priority,
         'dateStart': dateStart,
         'dateEnd': dateEnd,
+        "cursor": cursor,
       },
     );
     return res.data;
