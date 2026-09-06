@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mailmind/services/api.dart';
 import 'package:mailmind/services/emails.dart';
 import 'package:mailmind/services/socket.dart';
@@ -19,12 +20,56 @@ class Inbox extends ConsumerStatefulWidget {
 // 2. Change from State to ConsumerState
 class _InboxState extends ConsumerState<Inbox> {
   bool isLoading = true; // Use simple state for UI loading spinner only
+  bool addCatLoading = false;
 
   String? category;
   String? priority;
   String? starred;
   String? dateStart;
   String? dateEnd;
+  String addCategoryText = "";
+
+  List<Map<String, dynamic>> fixCategories = [
+    {"name": "assignment"},
+    {"name": "project"},
+    {"name": "syllabus"},
+    {"name": "task"},
+    {"name": "meeting"},
+    {"name": "review"},
+    {"name": "interview"},
+    {"name": "course"},
+    {"name": "exam"},
+    {"name": "submission"},
+    {"name": "invoice"},
+    {"name": "report"},
+    {"name": "schedule"},
+    {"name": "urgent"},
+    {"name": "education"},
+    {"name": "work"},
+    {"name": "school"},
+    {"name": "office"},
+    {"name": "OTP"},
+    {"name": "event"},
+    {"name": "hackathons"},
+    {"name": "class"},
+    {"name": "annoucements"},
+    {"name": "finace"},
+    {"name": "billing"},
+    {"name": "placement"},
+    {"name": "reminder"},
+    {"name": "fees"},
+    {"name": "scholarship"},
+    {"name": "timetable"},
+    {"name": "academic"},
+    {"name": "holiday"},
+    {"name": "club"},
+    {"name": "intership"},
+    {"name": "research"},
+    {"name": "Finace"},
+    {"name": "personal"},
+    {"name": "spam"},
+    {"name": "social"},
+  ];
 
   List<Map<String, dynamic>> categories = [
     {"name": "assignment"},
@@ -74,8 +119,9 @@ class _InboxState extends ConsumerState<Inbox> {
       getUserCategories()
           .then((value) {
             List<Map<String, dynamic>> newCat = [...categories];
+
             value.forEach((valueW) {
-              newCat.insert(0, {"name": valueW['name']});
+              newCat.insert(0, {"name": valueW['name'], "id": valueW['id']});
             });
 
             setState(() {
@@ -224,6 +270,77 @@ class _InboxState extends ConsumerState<Inbox> {
     ref.read(emailsProivder.notifier).updateValue(false, []);
     ref.read(hasMoreProvider.notifier).updateValue(true);
     getMoreEmails();
+  }
+
+  Future<void> addCategory() async {
+    dynamic value = await addCategories(addCategoryText);
+    List<dynamic> newAddedCat = await getUserCategories();
+    List<Map<String, Object?>> newCat = [...newAddedCat, ...categories];
+
+    if (value == "done") {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Category added successfully")),
+      );
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(value.toString())));
+      Navigator.pop(context);
+    }
+
+    setState(() {
+      categories = newCat;
+      addCategoryText = "";
+      addCatLoading = false;
+    });
+  }
+
+  void showAddCategoryModel() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Container(
+              height: 300,
+              width: MediaQuery.of(context).size.width,
+              child: Column(
+                children: [
+                  SizedBox(height: 10),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.95,
+                    child: TextField(
+                      decoration: InputDecoration(
+                        labelText: 'Enter category name',
+                        border: OutlineInputBorder(),
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          addCategoryText = value;
+                        });
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        addCatLoading = true;
+                      });
+                      addCategory();
+                    },
+                    child: addCatLoading == true
+                        ? Center(child: CircularProgressIndicator())
+                        : Text('Add Category'),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   void showFiltersModel() {
@@ -399,7 +516,7 @@ class _InboxState extends ConsumerState<Inbox> {
                       SizedBox(
                         width: 50,
                         child: IconButton(
-                          onPressed: () {},
+                          onPressed: showAddCategoryModel,
                           icon: const Icon(Icons.add),
                         ),
                       ),
@@ -437,9 +554,66 @@ class _InboxState extends ConsumerState<Inbox> {
                                         ], // Light Mode Colors
                                 ),
                               ),
-                              child: Center(
-                                child: Text(categories[index]['name']),
-                              ),
+                              child: categories[index]['id'] != null
+                                  ? Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Center(
+                                          child: Text(
+                                            categories[index]['name'],
+                                          ),
+                                        ),
+                                        SizedBox(width: 5),
+                                        IconButton(
+                                          onPressed: () async {
+                                            dynamic value =
+                                                await deleteCategories(
+                                                  categories[index]['id'],
+                                                );
+                                            if (value == "done") {
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text(
+                                                    "Category deleted successfully",
+                                                  ),
+                                                ),
+                                              );
+                                              List<Map<String, Object?>>
+                                              newCat = [...fixCategories];
+                                              List<dynamic> cat =
+                                                  await getUserCategories();
+
+                                              cat.forEach((valueW) {
+                                                newCat.insert(0, {
+                                                  "name": valueW['name'],
+                                                  "id": valueW['id'],
+                                                });
+                                              });
+                                              setState(() {
+                                                categories = newCat;
+                                              });
+                                            } else {
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    value.toString(),
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          },
+                                          icon: Icon(Icons.delete),
+                                        ),
+                                      ],
+                                    )
+                                  : Center(
+                                      child: Text(categories[index]['name']),
+                                    ),
                             ),
                           ),
                           separatorBuilder: (context, index) =>
@@ -539,132 +713,142 @@ class _InboxState extends ConsumerState<Inbox> {
                                   getMoreEmails();
                                 }
                               },
-                              child: SizedBox(
-                                width: screenWidth,
-                                child: Card(
-                                  child: Column(
-                                    children: [
-                                      SizedBox(height: 5),
-                                      SizedBox(
-                                        width: screenWidth * 0.97 * 0.95,
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.end,
-                                          children: [
-                                            Container(
-                                              padding: EdgeInsets.all(8),
-                                              decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.all(
-                                                  Radius.circular(200),
+                              child: GestureDetector(
+                                onTap: () {
+                                  context.go("/email/${email.gmailId}");
+                                },
+                                child: SizedBox(
+                                  width: screenWidth,
+                                  child: Card(
+                                    child: Column(
+                                      children: [
+                                        SizedBox(height: 5),
+                                        SizedBox(
+                                          width: screenWidth * 0.97 * 0.95,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: [
+                                              Container(
+                                                padding: EdgeInsets.all(8),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                        Radius.circular(200),
+                                                      ),
+                                                  gradient: LinearGradient(
+                                                    begin: Alignment.topLeft,
+                                                    end: Alignment.bottomRight,
+                                                    colors: isDarkMode
+                                                        ? [
+                                                            const Color(
+                                                              0xFF1E1E24,
+                                                            ),
+                                                            const Color(
+                                                              0xFF0F0F12,
+                                                            ),
+                                                          ] // Dark Mode Colors
+                                                        : [
+                                                            const Color(
+                                                              0xFF667EEA,
+                                                            ),
+                                                            const Color(
+                                                              0xFF764BA2,
+                                                            ),
+                                                          ], // Light Mode Colors
+                                                  ),
                                                 ),
-                                                gradient: LinearGradient(
-                                                  begin: Alignment.topLeft,
-                                                  end: Alignment.bottomRight,
-                                                  colors: isDarkMode
-                                                      ? [
-                                                          const Color(
-                                                            0xFF1E1E24,
-                                                          ),
-                                                          const Color(
-                                                            0xFF0F0F12,
-                                                          ),
-                                                        ] // Dark Mode Colors
-                                                      : [
-                                                          const Color(
-                                                            0xFF667EEA,
-                                                          ),
-                                                          const Color(
-                                                            0xFF764BA2,
-                                                          ),
-                                                        ], // Light Mode Colors
-                                                ),
+                                                child: Text(email.category),
                                               ),
-                                              child: Text(email.category),
-                                            ),
-                                            SizedBox(width: 2, height: 0),
-                                            Container(
-                                              padding: EdgeInsets.all(8),
-                                              decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.all(
-                                                  Radius.circular(200),
+                                              SizedBox(width: 2, height: 0),
+                                              Container(
+                                                padding: EdgeInsets.all(8),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                        Radius.circular(200),
+                                                      ),
+                                                  gradient: LinearGradient(
+                                                    begin: Alignment.topLeft,
+                                                    end: Alignment.bottomRight,
+                                                    colors:
+                                                        gradientColors, // Light Mode Colors
+                                                  ),
                                                 ),
-                                                gradient: LinearGradient(
-                                                  begin: Alignment.topLeft,
-                                                  end: Alignment.bottomRight,
-                                                  colors:
-                                                      gradientColors, // Light Mode Colors
-                                                ),
+                                                child: Text(email.priority),
                                               ),
-                                              child: Text(email.priority),
+                                            ],
+                                          ),
+                                        ),
+                                        SizedBox(height: 4),
+                                        SizedBox(
+                                          width: screenWidth * (0.97 * 0.95),
+                                          child: Text(
+                                            email.sender.split("<")[0],
+                                            style: TextStyle(
+                                              color: isDarkMode
+                                                  ? Color(0xFF8C9ABA)
+                                                  : Color.fromARGB(
+                                                      255,
+                                                      197,
+                                                      196,
+                                                      196,
+                                                    ),
                                             ),
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(height: 4),
-                                      SizedBox(
-                                        width: screenWidth * (0.97 * 0.95),
-                                        child: Text(
-                                          email.sender.split("<")[0],
-                                          style: TextStyle(
-                                            color: isDarkMode
-                                                ? Color(0xFF8C9ABA)
-                                                : Color.fromARGB(
-                                                    255,
-                                                    197,
-                                                    196,
-                                                    196,
-                                                  ),
+                                            textAlign: TextAlign.start,
                                           ),
-                                          textAlign: TextAlign.start,
                                         ),
-                                      ),
-                                      SizedBox(
-                                        width: screenWidth * (0.97 * 0.95),
-                                        child: Text(
-                                          email.subject,
-                                          style: TextStyle(),
-                                          textAlign: TextAlign.start,
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: screenWidth * (0.97 * 0.95),
-                                        child: Text(
-                                          email.summary.length <= 80
-                                              ? email.summary
-                                              : email.summary.substring(0, 27) +
-                                                    "...",
-                                          style: TextStyle(
-                                            color: isDarkMode
-                                                ? Color(0xFF8C9ABA)
-                                                : Color.fromARGB(
-                                                    255,
-                                                    197,
-                                                    196,
-                                                    196,
-                                                  ),
+                                        SizedBox(
+                                          width: screenWidth * (0.97 * 0.95),
+                                          child: Text(
+                                            email.subject,
+                                            style: TextStyle(),
+                                            textAlign: TextAlign.start,
                                           ),
-                                          textAlign: TextAlign.start,
                                         ),
-                                      ),
-                                      SizedBox(
-                                        width: screenWidth * (0.97 * 0.95),
-                                        child: Text(
-                                          dateWithTime,
-                                          style: TextStyle(
-                                            color: isDarkMode
-                                                ? Color(0xFF8C9ABA)
-                                                : Color.fromARGB(
-                                                    255,
-                                                    197,
-                                                    196,
-                                                    196,
-                                                  ),
+                                        SizedBox(
+                                          width: screenWidth * (0.97 * 0.95),
+                                          child: Text(
+                                            email.summary.length <= 80
+                                                ? email.summary
+                                                : email.summary.substring(
+                                                        0,
+                                                        27,
+                                                      ) +
+                                                      "...",
+                                            style: TextStyle(
+                                              color: isDarkMode
+                                                  ? Color(0xFF8C9ABA)
+                                                  : Color.fromARGB(
+                                                      255,
+                                                      197,
+                                                      196,
+                                                      196,
+                                                    ),
+                                            ),
+                                            textAlign: TextAlign.start,
                                           ),
-                                          textAlign: TextAlign.end,
                                         ),
-                                      ),
-                                      SizedBox(height: 5),
-                                    ],
+                                        SizedBox(
+                                          width: screenWidth * (0.97 * 0.95),
+                                          child: Text(
+                                            dateWithTime,
+                                            style: TextStyle(
+                                              color: isDarkMode
+                                                  ? Color(0xFF8C9ABA)
+                                                  : Color.fromARGB(
+                                                      255,
+                                                      197,
+                                                      196,
+                                                      196,
+                                                    ),
+                                            ),
+                                            textAlign: TextAlign.end,
+                                          ),
+                                        ),
+                                        SizedBox(height: 5),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),

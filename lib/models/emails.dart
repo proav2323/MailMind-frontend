@@ -18,7 +18,7 @@ class EMAIL {
   final bool isStarred;
   final bool isCompleted;
   final bool requiresAction;
-  final List<Map> bodyInOrder;
+  final List<dynamic> bodyInOrder;
   List<ATTACHMENTS> attachments = [];
 
   EMAIL({
@@ -39,7 +39,7 @@ class EMAIL {
     required this.isStarred,
     required this.lastOpenedAt,
     required this.requiresAction,
-    required List<Map> attachments,
+    required List<dynamic> attachments,
   }) {
     attachments.forEach((attachment) {
       ATTACHMENTS newAttachmant = ATTACHMENTS(
@@ -67,11 +67,11 @@ class EMAIL {
       priority: json['priority'] as String,
       subject: json['subject'] as String,
       aiPriority: json['aiPriority'] as String,
-      attachments: json['attachments'] as List<Map>,
-      bodyInOrder: json['bodyInOrder'] as List<Map>,
-      gmailSubject: json['gmailSubject'] as String,
+      attachments: json['attachments'] as List<dynamic>,
+      bodyInOrder: json['bodyInOrder'] as List<dynamic>,
+      gmailSubject: json['GmailSubject'] as String,
       isCompleted: json['isCompleted'] as bool,
-      isStarred: json['isStarred'] as bool,
+      isStarred: json['isStared'] as bool,
       lastOpenedAt:
           json['lastOpenedAt'] == null || json['lastOpenedAt'] == 'null'
           ? null

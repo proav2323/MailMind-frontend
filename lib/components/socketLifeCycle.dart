@@ -7,6 +7,7 @@ import 'package:mailmind/pages/home.dart';
 import 'package:mailmind/pages/year.dart';
 import 'package:mailmind/pages/login.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:mailmind/pages/email.dart';
 
 class SocketLifecycleManager extends StatefulWidget {
   SocketService? SOCKET;
@@ -114,5 +115,12 @@ final _router = GoRouter(
     GoRoute(path: '/', builder: (context, state) => MyHomePage(index: 0)),
     GoRoute(path: '/login', builder: (context, state) => LoginPage()),
     GoRoute(path: "/year", builder: (context, state) => yearSelect()),
+    GoRoute(
+      path: '/email/:id',
+      builder: (context, state) {
+        final emailId = state.pathParameters['id'];
+        return Email(id: emailId);
+      },
+    ),
   ],
 );

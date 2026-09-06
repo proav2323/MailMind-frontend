@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mailmind/models/email.dart';
+import 'package:mailmind/models/emails.dart';
 import 'package:mailmind/models/user.dart';
 import 'package:mailmind/services/emails.dart';
 import 'package:mailmind/services/firebase.dart';
@@ -226,7 +227,7 @@ Future<Map<String, Object?>> getUserFilteredEmailsApi(
   }
 }
 
-Future<List<Map<String, Object?>>> getUserCategories() async {
+Future<List<dynamic>> getUserCategories() async {
   if (_cookieJar == null) {
     await initApi();
   }
@@ -236,5 +237,46 @@ Future<List<Map<String, Object?>>> getUserCategories() async {
   } catch (e) {
     log(e.toString());
     return [];
+  }
+}
+
+Future<dynamic> addCategories(String name) async {
+  if (_cookieJar == null) {
+    await initApi();
+  }
+  try {
+    final res = await _dio.post('/categories/add', data: {'name': name});
+    return "done";
+  } on DioException catch (e) {
+    return e.message ?? "something went wrong";
+  }
+}
+
+Future<dynamic> deleteCategories(String id) async {
+  if (_cookieJar == null) {
+    await initApi();
+  }
+  try {
+    final res = await _dio.delete('/categories/delete/$id');
+    return "done";
+  } on DioException catch (e) {
+    log(e.toString());
+    return e.message ?? "something went wrong";
+  }
+}
+
+Future<EMAIL?> getEmailById(String id) async {
+  if (_cookieJar == null) {
+    await initApi();
+  }
+  try {
+    final res = await _dio.get('/emails/email/$id');
+    if (res.data == null) {
+      return null;
+    }
+    return EMAIL.fromJson(res.data);
+  } catch (e) {
+    log(e.toString());
+    return null;
   }
 }
