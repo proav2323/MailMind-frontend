@@ -213,7 +213,7 @@ class _MyHomePageState extends State<Email> {
                                           widget.email!.bodyInOrder[index -
                                               1]['data'];
 
-                                  return show == true
+                                  return show == true || index == 0
                                       ? Padding(
                                           padding: const EdgeInsets.symmetric(
                                             horizontal: 16.0,
