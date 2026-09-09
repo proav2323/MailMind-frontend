@@ -8,9 +8,10 @@ import 'package:mailmind/models/user.dart';
 import 'package:mailmind/services/api.dart';
 import 'package:mailmind/services/auth.dart';
 import 'package:mailmind/services/socket.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 class Email extends StatefulWidget {
-  String? id;
+  final String? id; // Made final as per good practices
   EMAIL? email;
   bool isLaoding = false;
 
@@ -46,6 +47,8 @@ class _MyHomePageState extends State<Email> {
                 widget.isLaoding = false;
                 widget.email = value;
               });
+              // Sorts the list parts by index 'i'
+              widget.email!.bodyInOrder.sort((a, b) => b['i'] - a['i']);
             }
           })
           .catchError((err) {
@@ -71,7 +74,6 @@ class _MyHomePageState extends State<Email> {
 
         socketService.whenData((socket) {
           socket.socket.on('connect', (_) {});
-
           socket.socket.on('disconnect', (_) {});
         });
 
@@ -83,10 +85,13 @@ class _MyHomePageState extends State<Email> {
                     showBackButton: true,
                     title: "",
                     actions: [
-                      IconButton(onPressed: () {}, icon: Icon(Icons.search)),
                       IconButton(
                         onPressed: () {},
-                        icon: Icon(Icons.notifications),
+                        icon: const Icon(Icons.search),
+                      ),
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.notifications),
                       ),
                     ],
                   ),
@@ -94,8 +99,8 @@ class _MyHomePageState extends State<Email> {
                 ? UserMainAppDrawer(
                     actions: [
                       ListTile(
-                        leading: Icon(Icons.home),
-                        title: Text('Home'),
+                        leading: const Icon(Icons.home),
+                        title: const Text('Home'),
                         selected: route == '/',
                         selectedColor: isDarkMode
                             ? Colors.grey
@@ -108,42 +113,123 @@ class _MyHomePageState extends State<Email> {
                   )
                 : null,
             body: widget.isLaoding == true
-                ? Center(child: CircularProgressIndicator())
+                ? const Center(child: CircularProgressIndicator())
                 : userProv.value != null && widget.email != null
-                ? Container(
-                    width: screenWidth * 0.95,
+                ? SizedBox(
+                    width: screenWidth,
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                widget.email!.subject,
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
+                        // 1. Email Subject Section
+                        Container(
+                          width: screenWidth * 0.95,
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  widget.email!.subject,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
-                            ),
-                            IconButton(
-                              onPressed: () {},
-                              icon: widget.email!.isStarred == true
-                                  ? Icon(Icons.star)
-                                  : Icon(Icons.star_border),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                        SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              ListTile(
-                                title: Text(widget.email!.subject),
-                                subtitle: Text(widget.email!.sender),
+                              IconButton(
+                                onPressed: () {},
+                                icon: widget.email!.isStarred == true
+                                    ? const Icon(Icons.star)
+                                    : const Icon(Icons.star_border),
                               ),
-                              Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Text(widget.email!.category),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+
+                        // 2. CustomScrollView Section
+                        Expanded(
+                          child: CustomScrollView(
+                            slivers: [
+                              SliverToBoxAdapter(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      // Sender Name
+                                      Expanded(
+                                        child: Text(
+                                          widget.email!.sender
+                                              .split("<")[0]
+                                              .split(">")[0],
+                                          style: const TextStyle(fontSize: 16),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      // Date & Actions
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            widget.email!.receivedAt
+                                                .toString()
+                                                .split(".")[0],
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 10),
+                                          IconButton(
+                                            onPressed: () {},
+                                            icon: const Icon(Icons.more_horiz),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const SliverToBoxAdapter(
+                                child: SizedBox(height: 10),
+                              ),
+
+                              // FIXED: Directly using SliverList.separated
+                              SliverList.separated(
+                                itemCount: widget.email!.bodyInOrder.length,
+                                separatorBuilder: (context, index) =>
+                                    const SizedBox(height: 24),
+                                itemBuilder: (con, index) {
+                                  final bodyPart =
+                                      widget.email!.bodyInOrder[index];
+                                  final String htmlContent = bodyPart['data'];
+                                  bool show =
+                                      index > 0 &&
+                                      bodyPart['data'] !=
+                                          widget.email!.bodyInOrder[index -
+                                              1]['data'];
+
+                                  return show == true
+                                      ? Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 16.0,
+                                          ),
+                                          child: HtmlWidget(
+                                            htmlContent.isEmpty
+                                                ? "<p>No content available</p>"
+                                                : htmlContent,
+                                            textStyle: const TextStyle(
+                                              fontSize: 15,
+                                              height: 1.4,
+                                            ),
+                                          ),
+                                        )
+                                      : null;
+                                },
                               ),
                             ],
                           ),
@@ -151,7 +237,7 @@ class _MyHomePageState extends State<Email> {
                       ],
                     ),
                   )
-                : Text("something went wrong"),
+                : const Center(child: Text("something went wrong")),
           ),
         );
       },
